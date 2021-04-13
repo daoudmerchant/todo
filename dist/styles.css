@@ -22,7 +22,6 @@ body {
 .box {
     border: 1px solid darkgrey;
     border-radius: 8px;
-    cursor: pointer;
 }
 
 .container {
@@ -36,16 +35,21 @@ body {
     font-weight: 600;
 }
 
+.viewbutton, .projectContainer, .delete, .notes, .importance, input[type="checkbox"] {
+    cursor: pointer;
+}
+
 .viewbutton, .box {
     margin: 2rem;
 }
+
 .container > * {
     margin: 10px;
 }
 
 input[type="color"], input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 25px;
 }
 
 .text {
@@ -89,6 +93,12 @@ textarea {
     font-size: larger;
     padding: 1rem;
     border-radius: 8px;
+    background-color: transparent;
+    border-color:rgba(0, 0, 0, 0.2)
+}
+
+textarea:focus {
+    outline: none;
 }
 
 .importance {
@@ -115,4 +125,8 @@ textarea {
 
 .hidden {
     display: none;
+}
+
+.selected {
+    background-color: white;
 }

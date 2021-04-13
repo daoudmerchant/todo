@@ -634,6 +634,14 @@ Clean the slate
 
 
 
+##### *function Toggle hidden*
+
+###### ...elements
+
+- For each element, toggle 'hidden' class
+
+
+
 If the second argument is an object, it is a project, and therefore declare a variable as the todo parameter array
 
 Otherwise, if it is an array, it is all the projects, and therefore stays as it is
@@ -660,6 +668,10 @@ Otherwise, if it is an array, it is all the projects, and therefore stays as it 
 
 ​			class: hidden }
 
+- *If there's a project index, assign it to the project dataset and add a todo dataset with the current index, otherwise set the current index to the project index*
+
+- Add an **event listener** of **focusout** to the name which runs the function [**Submit name**](#function-submit-name) using the **current input value**, the **project index** value and (if it has one) the **todo index** value
+
 - Create a name element using the object
 
   ​	{ type: p
@@ -668,10 +680,9 @@ Otherwise, if it is an array, it is all the projects, and therefore stays as it 
 
   ​	text: name parameter }
 
-- *If there's a project index, assign it to the project dataset and add a todo dataset with the current index, otherwise set the current index to the project index*
+- *If a project, assign it the project index of the item in the array*
 
-- Add an **event listener** of **focusout** to the name which runs the function [**Submit name**](#function-submit-name) using the **current input value**, the **project index** value and (if it has one) the **todo index** value
-
+- Add an **event listener** of **doubleclick** to the name which toggles the hidden class of the name element and the name input element
 - Assign the function [**Create delete key()**](#function-create-delete-key) to a variable
 
 
@@ -680,6 +691,7 @@ If projects:
 
 - Assign either the class 'container projectContainer' to the container
 - Add an **event listener** of **click** to the container which runs the function [**View project**](#function-view-project) using the return value of function [**todo.Return todos for todo view**](#function-return-todos-for-todo-view) and the **main task view**
+- Add an **event listener** of **click** to the name element which runs
 - Add the class 'projectName' to the name input
 - Assign the color property of the project to the name box
 - Assign a project data attribute of the current index
