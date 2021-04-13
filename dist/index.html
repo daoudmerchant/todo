@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Todo App</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div id="sidebar">
+      <div id="default" class="viewbutton">View all</div>
+      <div id="important" class="viewbutton">Important</div>
+      <div id="overdue" class="viewbutton">Overdue</div>
+      <div id="duesoon" class="viewbutton">Due this week</div>
+      <div id="projecthead" class="viewbutton">Projects</div>
+      <div id="projectbar"> <!-- fill with JS -->
+        <div class="box container projectContainer complete">
+          <input type="color" value="#fc2003">
+          <input type="text" class="text textinput hidden" spellcheck="false" value="Example project">
+          <p class="text name">Example project</p>
+          <div class="delete">✖</div>
+        </div>
+        <div class="box container projectContainer">
+          <input type="color" value="#0362fc">
+          <input type="text" class="text textinput" spellcheck="false" value="Example completed project">
+          <div class="delete">✖</div>
+        </div>
+        <div class="box container projectContainer new">
+          <input type="text" class="text textinput" spellcheck="false" placeholder="+ add new">
+        </div>
+      </div> 
+    </div>
+    <div id="todoview"> <!-- fill with JS -->
+      <div class="box">
+        <div class="container todoContainer">
+          <input type="checkbox">
+          <input type="text" class="text textinput" spellcheck="false" value="Example todo">
+          <p>&#9776;</p>
+          <p class="importance urgent">!</p>
+          <input type="date" class="textinput">
+          <div class="delete">✖</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="container todoContainer complete">
+          <input type="checkbox">
+          <input type="text" class="text textinput" spellcheck="false" value="Example completed todo">
+          <p>&#9776;</p>
+          <p class="importance urgent">!</p>
+          <input type="date" class="textinput">
+          <div class="delete">✖</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="container todoContainer complete">
+          <input type="checkbox">
+          <input type="text" class="text textinput" spellcheck="false" value="Example todo with notes">
+          <p>&#9776;</p>
+          <p class="importance">!</p>
+          <input type="date" class="textinput">
+          <div class="delete">✖</div>
+        </div>
+        <textarea rows="6" class="textarea">Here are a bunch of notes assigned to a todo</textarea>
+      </div>
+      <div class="box container new">
+        <input type="text" class="text textinput" spellcheck="false" placeholder="+ add new">
+      </div>
+    </div>
+    <script src="./main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap');
+
+* {
+    font-family: 'Raleway', sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 500px 1fr;
+}
+
+#sidebar {
+    background-color:lavender;
+}
+
+#todoview {
+    background-color: lavenderblush;
+}
+
+.box {
+    border: 1px solid darkgrey;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.viewbutton {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.viewbutton, .box {
+    margin: 2rem;
+}
+.container > * {
+    margin: 10px;
+}
+
+input[type="color"], input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+.text {
+    width: 100%;
+    padding: 0;
+}
+
+.name {
+    user-select: none;
+}
+
+.textinput {
+    border: none;
+    background-color: transparent;
+}
+
+.textinput, .name {
+    font-size: larger;
+}
+
+.textinput:focus{
+    outline: none;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+input[type="date"] {
+    width: 260px;
+}
+
+.delete {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 5px 8px;
+    border-radius: 50%;
+    color: black;
+}
+
+textarea {
+    width: 95%;
+    display: block;
+    margin: 0 auto 20px;
+    font-size: larger;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.importance {
+    color: rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    font-size: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0 10px;
+    border-radius: 8px;
+}
+
+.urgent {
+    color: red;
+}
+
+.complete > .text {
+    color: rgba(0, 0, 0, 0.2);
+    text-decoration: line-through;
+}
+
+.new:first-child {
+    width: 100%;
+}
+
+.hidden {
+    display: none;
+}
