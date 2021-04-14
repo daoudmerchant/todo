@@ -38,7 +38,7 @@ const todo = (function() {
                     name: "Tidy up my room",
                     dueDate: new Date(2021, 7, 5),
                     important: true,
-                    description: "Put the socks in the drawers, generally sort it out",
+                    notes: "Put the socks in the drawers, generally sort it out",
                     complete: false
                 }
             ]
@@ -78,71 +78,89 @@ const todo = (function() {
         return this.todos.filter(todo => todo.dueDate < today);
     };
 
-    // project functions
+    // private functions
 
-    function returnAllProjects() {
+    function _returnItem(projIndex, todoIndex) {
+        if (todoIndex) {
+            return projectArray[projIndex].todos[todoIndex];
+        } else {
+            return projectArray[projIndex];
+        }
+    };
+
+    // universal functions
+
+    function returnAll() {
         return projectArray
     }
 
-    function addProject(name) {
-        const newProject = {
-            name,
-            color: "#000000",
-            get complete() {
-                return _getCompleteStatus.call(this);
-            },
-            get urgent() {
-                return _getUrgentTodos.call(this);
-            },
-            get dueThisWeek() {
-                return _getTodosDue.call(this);
-            },
-            get overdue() {
-                return _getOverdueTodos.call(this);
-            },
-            todos: []
-        }
-        projectArray.push(newProject);
-        return projectArray;
-    }
-
-    function editProject(i, attr, value) {
-        const thisProj = projectArray[i];
-        thisProj[attr] = value;
-        return projectArray;
-    }
-
-    function deleteProject(i) {
-        if (confirm("Are you sure you want to delete the list " +
-            projectArray[i].name + "?")) {
-                projectArray.splice(i, 1);
-                return projectArray; // or not?
-            }
-    };
-
-    function addTodo(name, projIndex) {
-        const newTodo = {
-            name,
-            dueDate: undefined,
-            important: false,
-            notes: undefined,
-            complete: false
-        };
+    function addItem(name, projIndex) {
         if (projIndex) {
-            projectArray[projIndex].push(newTodo);
+            const newTodo = {
+                name,
+                dueDate: undefined,
+                important: false,
+                notes: undefined,
+                complete: false
+            };
+            _returnItem(projIndex).push(newTodo);
         } else {
-            projectArray[0].push(newTodo);
-        }
+            const newProject = {
+                name,
+                color: "#000000",
+                get complete() {
+                    return _getCompleteStatus.call(this);
+                },
+                get urgent() {
+                    return _getUrgentTodos.call(this);
+                },
+                get dueThisWeek() {
+                    return _getTodosDue.call(this);
+                },
+                get overdue() {
+                    return _getOverdueTodos.call(this);
+                },
+                todos: []
+            }
+            returnAll().push(newProject);
+        };
+        return projectArray;
     }
+
+    function editItem(attr, value, projIndex, todoIndex) {
+        if (todoIndex) {
+            _returnItem(projIndex, todoIndex)[attr] = value;
+        } else {
+            _returnItem(projIndex)[attr] = value;
+        }
+        return projectArray;
+    }
+    
+    function moveItem(oldProjIndex, newProjIndex, oldTodoIndex,) {
+        if (oldTodoIndex) {
+            const movedTodo = _returnItem(oldProjIndex).todos.splice(oldTodoIndex, 1);
+            _returnItem(newProjIndex).todos.push(movedTodo);
+        } // else { some code down the line to reorder projects }
+        return projectArray; // or not?
+    }
+
+    function deleteItem(projIndex, todoIndex) {
+        if (todoIndex) {
+            _returnItem(projIndex).todos.splice(todoIndex, 1);
+        } else {
+            _returnAll().splice(projIndex, 1);
+        }
+        return projectArray; // or not?
+    };
 
     // return functions
 
     return {
-        returnAllProjects,
-        addProject,
-        editProject,
-        deleteProject,
-        addTodo,
+        returnAll,
+        addItem,
+        editItem,
+        moveItem,
+        deleteItem,
     }
 
 })();
