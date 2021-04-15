@@ -429,21 +429,21 @@ If input is a hex code, it's a color, otherwise it's a name
 
 #### *function Submit name*
 
-##### name, project index, todo index
+##### element
 
-If *all three parameters are included*, it is an **edited todo name**, and therefore:
+If element has *projectindex and todoindex dataset attributes*, it is an **edited todo name**, and therefore:
 
-- run [**todo.Edit name**](#function-edit-name) with the three parameters
+- run [**todo.Edit name**](#function-edit-name) with the contents and both indexes
 
-If *just a name and a project index*, it is an **edited project name**, and therefore:
+If *just a project index*, it is an **new todo**, and therefore:
 
 - run [**todo.Edit name**](#function-edit-name) with the name and the project index
 
-If *a name and a project index of null*, it is a **new project**, and therefore:
+If it has *no index*, it is a **new project**, and therefore:
 
 - run [**todo.Add project**](#function-add-project) with the project name
 
-If *a name, a project index and a todo index of null*, it is a **new todo**, and therefore:
+If *a name, a project index and a todo index of null*, it is a ****, and therefore:
 
 - run [**todo.Add todo**](#function-add-todo) with the project index and todo index
 
@@ -557,7 +557,7 @@ Otherwise, if both arguments are provided, the **todo** is being deleted and the
 
 #### *function Add new button*
 
-##### element, project or todo
+##### element
 
 - Create a simple div container (with a class of 'container')
 
@@ -573,8 +573,8 @@ Otherwise, if both arguments are provided, the **todo** is being deleted and the
 
 - Add an **event listener** of **focusout** which runs the function [**Submit name**](#function-submit-name) with:
 
-  - **contents and *null*** if a project, or
-  - **contents, project index and *null*** if a todo
+  - **contents and *null*** if the element is the project panel, or
+  - **contents, project index and *null*** if it's the todo panel
 
 - Append this to the given element
 
@@ -583,6 +583,8 @@ Otherwise, if both arguments are provided, the **todo** is being deleted and the
 #### *function Render list*
 
 ##### element, either array of projects or just one project, optional project index
+
+> First argument **must** be parent element (project or task panel) to work in rerender function
 
 
 

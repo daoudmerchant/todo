@@ -8,7 +8,7 @@ const DOMtools = (function() {
         }
     }
 
-    function createElement(obj) {
+    function returnElement(obj) {
 
         // parameter object can contain maximum:
         //     type: ...
@@ -24,34 +24,49 @@ const DOMtools = (function() {
         //         [data-todoIndex, ...]
         //     ]
 
-        const newElement = document.createElement(type);
+        const newElement = document.createElement(obj.type);
         if (obj.hasOwnProperty("class_es")) {
             newElement.className = obj.class_es;
         }
         if (obj.hasOwnProperty("text")) {
-            newElement.textContent = obj.text;
+            newElement.innerHTML = obj.text;
         }
-        if (obj.hasOwnProperty("attribute")) {
-            const entries = Object.entries(obj);
-            for (const [attr, value] of entries) {
-                newElement.setAttribute(attr, value);
-            };
-        }        
+        // if (obj.hasOwnProperty("attribute")) {
+        //     const entries = Object.entries(obj);
+        //     for (const [attr, value] of entries) {
+        //         newElement.setAttribute(attr, value);
+        //     };
+        // }
+        return newElement;
+    }
+
+    function setAttributes(element, attributes) {
+        const entries = Object.entries(attributes);
+        for (const [attr, value] of entries) {
+            element.setAttribute(attr, value);
+        }
+        // return element;
     }
 
     function appendChildren(parent, ...children) {
         children.forEach(child => parent.appendChild(child));
     }
 
-    function rerender(parent, callback, ...parameters) {
-        _emptyElement(parent);
+    function addEventListeners(fn, ...elements) {
+        elements.forEach(element => element.addEventListener(fn));
+    }
+
+    function clearAndRender(parent, callback, ...parameters) {
+        // _emptyElement(parent);
         callback(parent, ...parameters);
     }
 
     return {
-        createElement,
+        returnElement,
+        setAttributes,
         appendChildren,
-        rerender
+        addEventListeners,
+        clearAndRender
     }
 })();
 

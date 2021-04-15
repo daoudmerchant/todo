@@ -15,12 +15,27 @@ const todo = (function() {
             get overdue() {
                 return _getOverdueTodos.call(this);
             },
-            todos: []
+            todos: [
+                {
+                    name: "Buy the groceries",
+                    dueDate: new Date(2021, 6, 14),
+                    important: true,
+                    notes: "Get a bunch of yummy food",
+                    complete: false
+                },
+                {
+                    name: "Wash the car",
+                    dueDate: undefined,
+                    important: false,
+                    notes: undefined,
+                    complete: false
+                }
+            ]
         },
         {
 
             name: "Do the cleaning",
-            color: "#000000",
+            color: "#4245f5",
             get complete() {
                 return _getCompleteStatus.call(this);
             },
@@ -39,6 +54,27 @@ const todo = (function() {
                     dueDate: new Date(2021, 7, 5),
                     important: true,
                     notes: "Put the socks in the drawers, generally sort it out",
+                    complete: false
+                },
+                {
+                    name: "Do the laundry",
+                    dueDate: new Date(2021, 7, 5),
+                    important: false,
+                    notes: "Put everything in those little baggies",
+                    complete: false
+                },
+                {
+                    name: "Wash the dishes",
+                    dueDate: new Date(2021, 3, 9),
+                    important: true,
+                    notes: "Put the socks in the drawers, generally sort it out",
+                    complete: true
+                },
+                {
+                    name: "Vacuum clean",
+                    dueDate: undefined,
+                    important: true,
+                    notes: undefined,
                     complete: false
                 }
             ]
@@ -80,7 +116,7 @@ const todo = (function() {
 
     // private functions
 
-    function _returnItem(projIndex, todoIndex) {
+    function returnItem(projIndex, todoIndex) {
         if (todoIndex) {
             return projectArray[projIndex].todos[todoIndex];
         } else {
@@ -88,10 +124,12 @@ const todo = (function() {
         }
     };
 
-    // universal functions
-
     function returnAll() {
         return projectArray
+    }
+
+    function returnProjNames() {
+        return projectArray.map(project => project.name);
     }
 
     function addItem(name, projIndex) {
@@ -103,7 +141,7 @@ const todo = (function() {
                 notes: undefined,
                 complete: false
             };
-            _returnItem(projIndex).push(newTodo);
+            returnItem(projIndex).push(newTodo);
         } else {
             const newProject = {
                 name,
@@ -139,16 +177,16 @@ const todo = (function() {
     function moveItem(oldProjIndex, newProjIndex, oldTodoIndex,) {
         if (oldTodoIndex) {
             const movedTodo = _returnItem(oldProjIndex).todos.splice(oldTodoIndex, 1);
-            _returnItem(newProjIndex).todos.push(movedTodo);
+            returnItem(newProjIndex).todos.push(movedTodo);
         } // else { some code down the line to reorder projects }
         return projectArray; // or not?
     }
 
     function deleteItem(projIndex, todoIndex) {
         if (todoIndex) {
-            _returnItem(projIndex).todos.splice(todoIndex, 1);
+            returnItem(projIndex).todos.splice(todoIndex, 1);
         } else {
-            _returnAll().splice(projIndex, 1);
+            returnAll().splice(projIndex, 1);
         }
         return projectArray; // or not?
     };
@@ -156,7 +194,9 @@ const todo = (function() {
     // return functions
 
     return {
+        returnItem,
         returnAll,
+        returnProjNames,
         addItem,
         editItem,
         moveItem,

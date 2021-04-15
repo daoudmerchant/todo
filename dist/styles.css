@@ -57,6 +57,10 @@ input[type="color"], input[type="checkbox"] {
     padding: 0;
 }
 
+.select {
+    width: 50%
+}
+
 .name {
     user-select: none;
 }
@@ -76,7 +80,7 @@ input[type="color"], input[type="checkbox"] {
 }
 
 input[type="date"] {
-    width: 260px;
+    width: 30%;
 }
 
 .delete {
