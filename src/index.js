@@ -3,249 +3,249 @@ import DOMtools from "./domtools.js";
 
 // work in console
 
-// window.todo = todo;
-// window.DOMtools = DOMtools;
+window.todo = todo;
+window.DOMtools = DOMtools;
 
-const submit = function(element) {
+// const submit = function(element) {
 
-    function name() {
-        const newName = this.value;
-        const projIndex = this.dataset.projectindex;
-        if (!this.hasAttribute("data-todoindex")) { // no todo index attribute, is a new box
-            if (projIndex) { // project index, is a new todo
-                todo.addItem(newName, projIndex);
-            } else { // no project index, is a new project
-                todo.addItem(newName);
-            }
-        } else { // has own todo index attribute, is an edited box
-            const todoIndex = this.dataset.todoindex;
-            if (todoIndex) { // has valid todo index, is an edited todo
-                todo.editItem("name", newName, projIndex, todoIndex);
-            } else { // has todo index attribute of null, is an edited project
-                todo.editItem("name", newName, projIndex);
-            }
-        }
-    };
+//     function name() {
+//         const newName = this.value;
+//         const projIndex = this.dataset.projectindex;
+//         if (!this.hasAttribute("data-todoindex")) { // no todo index attribute, is a new box
+//             if (projIndex) { // project index, is a new todo
+//                 todo.addItem(newName, projIndex);
+//             } else { // no project index, is a new project
+//                 todo.addItem(newName);
+//             }
+//         } else { // has own todo index attribute, is an edited box
+//             const todoIndex = this.dataset.todoindex;
+//             if (todoIndex) { // has valid todo index, is an edited todo
+//                 todo.editItem("name", newName, projIndex, todoIndex);
+//             } else { // has todo index attribute of null, is an edited project
+//                 todo.editItem("name", newName, projIndex);
+//             }
+//         }
+//     };
 
-    function deletion() {
-        if (this.hasAttribute("data-todoindex")) {
-            todo.deleteItem(this.dataset.projectindex, this.dataset.todoindex);
-        } else {
-            todo.deleteItem(this.dataset.projectindex);
-        }
-    }
+//     function deletion() {
+//         if (this.hasAttribute("data-todoindex")) {
+//             todo.deleteItem(this.dataset.projectindex, this.dataset.todoindex);
+//         } else {
+//             todo.deleteItem(this.dataset.projectindex);
+//         }
+//     }
 
-    function completion() {
+//     function completion() {
 
-    }
+//     }
 
-    function projectChange() {
+//     function projectChange() {
 
-    }
+//     }
 
-    function color() {
+//     function color() {
 
-    }
+//     }
 
-}
+// }
 
-const render = (function() {
-    // panel element queries
+// const render = (function() {
+//     // panel element queries
 
-    const projectPanel = document.querySelector("#projectbar");
-    const todoPanel = document.querySelector("#todoview");
+//     const projectPanel = document.querySelector("#projectbar");
+//     const todoPanel = document.querySelector("#todoview");
 
-    // permanent project element queries
+//     // permanent project element queries
 
-    const defaultView = document.querySelector("#default");
-    const importantView = document.querySelector("#important");
-    const overdueView = document.querySelector("#overdue");
-    const thisWeekView = document.querySelector("#duethisweek");
+//     const defaultView = document.querySelector("#default");
+//     const importantView = document.querySelector("#important");
+//     const overdueView = document.querySelector("#overdue");
+//     const thisWeekView = document.querySelector("#duethisweek");
 
-    // attached event listeners
+//     // attached event listeners
 
-    defaultView.addEventListener("click", _viewDefault);
-    importantView.addEventListener("click", _viewImportant);
-    overdueView.addEventListener("click", _viewOverdue);
-    thisWeekView.addEventListener("click", _viewDueThisWeek);
+//     defaultView.addEventListener("click", _viewDefault);
+//     importantView.addEventListener("click", _viewImportant);
+//     overdueView.addEventListener("click", _viewOverdue);
+//     thisWeekView.addEventListener("click", _viewDueThisWeek);
 
-    // current render
+//     // current render
 
-    let _viewCurrent = _viewDefault;
+//     let _viewCurrent = _viewDefault;
 
-    // view render functions
+//     // view render functions
 
-    function _viewDefault() {
-        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "todos");
-        _viewCurrent = _viewDefault;
-    }
+//     function _viewDefault() {
+//         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "todos");
+//         _viewCurrent = _viewDefault;
+//     }
 
-    function _viewImportant() {
-        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "important");
-        _viewCurrent = _viewImportant;
-    }
+//     function _viewImportant() {
+//         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "important");
+//         _viewCurrent = _viewImportant;
+//     }
 
-    function _viewOverdue() {
-        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "overdue");
-        _viewCurrent = _viewOverdue;
-    }
+//     function _viewOverdue() {
+//         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "overdue");
+//         _viewCurrent = _viewOverdue;
+//     }
 
-    function _viewDueThisWeek() {
-        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "dueThisWeek")
-        _viewCurrent = _viewDueThisWeek;
-    }
+//     function _viewDueThisWeek() {
+//         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "dueThisWeek")
+//         _viewCurrent = _viewDueThisWeek;
+//     }
 
-    function _viewProject(i) {
-        function _selectProject(index) {
-            const projects = document.querySelectorAll(".project");
-            projects.item(index - 1).classList.add("selected")
-        }
-        _renderPanel(todoPanel, renderList, todo.returnItem(i).todos, i, todo.returnItem(i).color)
-        _selectProject(i);
-        _viewCurrent = () => _viewProject(i);
-    }
+//     function _viewProject(i) {
+//         function _selectProject(index) {
+//             const projects = document.querySelectorAll(".project");
+//             projects.item(index - 1).classList.add("selected")
+//         }
+//         _renderPanel(todoPanel, renderList, todo.returnItem(i).todos, i, todo.returnItem(i).color)
+//         _selectProject(i);
+//         _viewCurrent = () => _viewProject(i);
+//     }
 
-    function _viewProjectList() {
-        _renderPanel(projectPanel, renderList, todo.returnAll());
-    }
+//     function _viewProjectList() {
+//         _renderPanel(projectPanel, renderList, todo.returnAll());
+//     }
 
-    // page rendering functions
+//     // page rendering functions
 
-    function _renderPanel(panel, ...args) { // runs function and adds new box
+//     function _renderPanel(panel, ...args) { // runs function and adds new box
         
-        function _addNewButton(panel, index = undefined) {
-            const container = DOMtools.returnElement({
-                type: "div",
-                class_es: "box container new"
-            });
-            const newNameInput = DOMtools.returnElement({
-                type: "input",
-                class_es: "text textinput",
-                attribute: {
-                    type: "text",
-                    placeholder: "+ add new",
-                    "data-projectindex": index
-                }
-            });
-            newNameInput.addEventListener("focusout", submit.name);
-            panel.appendChild(container);
-        }
+//         function _addNewButton(panel, index = undefined) {
+//             const container = DOMtools.returnElement({
+//                 type: "div",
+//                 class_es: "box container new"
+//             });
+//             const newNameInput = DOMtools.returnElement({
+//                 type: "input",
+//                 class_es: "text textinput",
+//                 attribute: {
+//                     type: "text",
+//                     placeholder: "+ add new",
+//                     "data-projectindex": index
+//                 }
+//             });
+//             newNameInput.addEventListener("focusout", submit.name);
+//             panel.appendChild(container);
+//         }
 
-        DOMtools.clearAndRender(panel, ...args);
-        const lastArg = args[args.length - 1];
-        if (typeof(lastArg) === "number") { // is an index
-            _addNewButton(panel, lastArg)
-        } else {
-            _addNewButton(panel);
-        }
-    }
+//         DOMtools.clearAndRender(panel, ...args);
+//         const lastArg = args[args.length - 1];
+//         if (typeof(lastArg) === "number") { // is an index
+//             _addNewButton(panel, lastArg)
+//         } else {
+//             _addNewButton(panel);
+//         }
+//     }
 
-    // projectPanel or to view specific project, e.g.
-    //   _renderPanel(todoPanel, renderList, projectArray[1].todos, 1)
-    //      - renders first user project
-    //   _renderPanel(projectPanel, renderList, projectArray)
-    //      - renders project panel
+//     // projectPanel or to view specific project, e.g.
+//     //   _renderPanel(todoPanel, renderList, projectArray[1].todos, 1)
+//     //      - renders first user project
+//     //   _renderPanel(projectPanel, renderList, projectArray)
+//     //      - renders project panel
 
-    function renderAllLists(panel, array, attr) {
-        array.forEach((project, i) => renderList(panel, project[attr], project.color, i))
-    }
+//     function renderAllLists(panel, array, attr) {
+//         array.forEach((project, i) => renderList(panel, project[attr], project.color, i))
+//     }
 
-    // To get default view:
+//     // To get default view:
     
-    //     _renderPanel(todoPanel, renderAllLists, projectArray, todos)
+//     //     _renderPanel(todoPanel, renderAllLists, projectArray, todos)
 
-    // runs:
+//     // runs:
 
-    //     DOMtools.rerender(todoPanel, renderAllLists, projectArray, todos)
+//     //     DOMtools.rerender(todoPanel, renderAllLists, projectArray, todos)
         
-    // which empties the todoPanel and then runs:
+//     // which empties the todoPanel and then runs:
 
-    //     renderAllLists(todoPanel, projectArray, todos)
+//     //     renderAllLists(todoPanel, projectArray, todos)
 
-    // which runs for each project of the projectArray:
+//     // which runs for each project of the projectArray:
 
-    //     renderList(todoPanel, project[todos], i, project.color)
+//     //     renderList(todoPanel, project[todos], i, project.color)
 
-    // filling the todoPanel before adding a new button
-
-
-
-    // To fill the project bar:
-
-    //     _renderPanel(projectPanel, renderList, projectArray)
-
-    // runs:
-
-    //     DOMtools.rerender(projectPanel, renderList, projectArray)
-
-    // which empties the projectPanel and then runs:
-
-    //     renderList(projectPanel, projectArray)
-
-    // filling the projectPanel before adding a new button
-
-    // important: DOMtools.rerender(todoPanel, renderAllLists, projectArray, important)
-    // overdue: DOMtools.rerender(todoPanel, renderAllLists, projectArray, overdue)
-    // dueThisWeek: DOMtools.rerender(todoPanel, renderAllLists, projectArray, dueThisWeek)
-    // specific project: _renderPanel(todoPanel, renderList, project.todos, projIndex, project.color)
+//     // filling the todoPanel before adding a new button
 
 
 
-    // public
+//     // To fill the project bar:
 
-    function renderView(element) {
-        _viewProjectList(); // always redraw project bar
-        if (element.hasAttribute("id")) { // not a project
-            switch (element.id) {
-                case "default" :
-                    _viewDefault();
-                    break;
-                case "important" :
-                    _viewImportant();
-                    break;
-                case "overdue" :
-                    _viewOverdue();
-                    break;
-                case "duethisweek" :
-                    _viewDueThisWeek();
-                    break;
-            }
-        } else { // is project
-            _viewProject(element.dataset.projectindex);
-        }
-    }
+//     //     _renderPanel(projectPanel, renderList, projectArray)
 
-    function renderCurrent() {
-        _viewProjectList();
-        _viewCurrent()
-    }
+//     // runs:
 
-    return {
-        renderView,
-        renderCurrent
-    }
-})();
+//     //     DOMtools.rerender(projectPanel, renderList, projectArray)
 
-function renderList(panel, array, color, projIndex) { // last two parameters optional
+//     // which empties the projectPanel and then runs:
+
+//     //     renderList(projectPanel, projectArray)
+
+//     // filling the projectPanel before adding a new button
+
+//     // important: DOMtools.rerender(todoPanel, renderAllLists, projectArray, important)
+//     // overdue: DOMtools.rerender(todoPanel, renderAllLists, projectArray, overdue)
+//     // dueThisWeek: DOMtools.rerender(todoPanel, renderAllLists, projectArray, dueThisWeek)
+//     // specific project: _renderPanel(todoPanel, renderList, project.todos, projIndex, project.color)
+
+
+
+//     // public
+
+//     function renderView(element) {
+//         _viewProjectList(); // always redraw project bar
+//         if (element.hasAttribute("id")) { // not a project
+//             switch (element.id) {
+//                 case "default" :
+//                     _viewDefault();
+//                     break;
+//                 case "important" :
+//                     _viewImportant();
+//                     break;
+//                 case "overdue" :
+//                     _viewOverdue();
+//                     break;
+//                 case "duethisweek" :
+//                     _viewDueThisWeek();
+//                     break;
+//             }
+//         } else { // is project
+//             _viewProject(element.dataset.projectindex);
+//         }
+//     }
+
+//     function renderCurrent() {
+//         _viewProjectList();
+//         _viewCurrent()
+//     }
+
+//     return {
+//         renderView,
+//         renderCurrent
+//     }
+// })();
+
+function renderList(panel, array, color = null, projIndex = null) { // last two parameters optional
 
     // element creation functions
 
     function createContainer(obj, i) {
         const container = DOMtools.returnElement({
             type: "div",
-            class_es: (obj.complete) ? "container complete" : "container",
-            // attribute: {
-            //     "data-projectindex": (projIndex) ? projIndex : i
-            // }
+            class: "container",
+            attribute: {
+                "data-projectindex": (projIndex) ? projIndex : i
+            }
         });
         // test 1
-        container.setAttribute("data-projectindex", (projIndex) ? projIndex : i);
+        // container.setAttribute("data-projectindex", (projIndex) ? projIndex : i);
         // test 2
         // DOMtools.setAttributes(container, {
         //     "data-projectindex": (projIndex) ? projIndex : i
         // });
         //
-        if (projIndex) {
+        if (projIndex !== null) {
             container.setAttribute("data-todoindex", i);
         }
         return container;
@@ -260,6 +260,7 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
             }
         });
         // colorPicker.addEventListener("input", submitAndRerender)
+        return colorPicker;
     }
 
     function createCheckbox(complete) { // requires id and name to submit correctly?
@@ -272,28 +273,34 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
         if (complete) {
             checkbox.checked = "true"
         }
+        return checkbox;
     }
 
     function createName(obj) {
         const nameText = DOMtools.returnElement({
             type: "p",
-            class_es: "text name",
+            class: "text name",
             text: obj.name,
-            attribute: {
-                style: (color) ? `color:${color}` : `color:${obj.color}`
-            }
         })
-        nameText.addEventListener("dblclick", toggleInput)
-        if (!projIndex) { // is a project
-            nameText.addEventListener("click", render.renderView(this));
+        if (obj.complete) {
+            nameText.classList.add("complete")
+        } else {
+            nameText.setAttribute(
+                "style",
+                (color) ? `color:${color}` : `color:${obj.color}`
+            )
         }
+        // nameText.addEventListener("dblclick", toggleInput)
+        // if (!projIndex) { // is a project
+            // nameText.addEventListener("click", render.renderView(this));
+        // }
         return nameText;
     }
 
     function createNameInput(name) { // send obj.name
         const nameText = DOMtools.returnElement({
             type: "input",
-            class_es: "text textinput hidden",
+            class: "text textinput hidden",
             attribute: {
                 type: "text",
                 spellcheck: "false",
@@ -307,7 +314,7 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
     function createSelectBox() {
         const selectContainer = DOMtools.returnElement({
             type: "select",
-            class_es: "text select"
+            class: "text select"
         });
         todo.returnProjNames().forEach((project, i) => {
             const option = DOMtools.returnElement({
@@ -328,39 +335,41 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
     function createNotesIcon() {
         const notesIcon = DOMtools.returnElement({
             type: "p",
-            class_es: "notes",
+            class: "notes",
             text: "☰"
         })
-        notesIcon.addEventListener("click", toggleNotesAndSubmit);
+        // notesIcon.addEventListener("click", toggleNotesAndSubmit);
         return notesIcon;
     }
 
     function createImportantIcon(importance) { // send obj.important
-        return DOMtools.returnElement({
+        const importantIcon = DOMtools.returnElement({
             type: "p",
-            class_es: (importance) ? "importance urgent" : "importance",
+            class: (importance) ? "importance urgent" : "importance",
             text: "!"
-        })
+        });
+        // add event listner
+        return importantIcon;
     }
 
-    function createDateInput(obj) {
+    function createDateInput(date) {
         const dateInput = DOMtools.returnElement({
             type: "input",
-            class_es: "textinput",
+            class: "textinput",
             attribute: {
                 type: "date"
             }
         });
-        if (obj.dueDate) {
-            dateInput.setAttribute("value", obj.dueDate);
+        if (date) {
+            dateInput.setAttribute("value", date);
         }
-
+        return dateInput
     }
 
     function createDeleteKey() {
         const deleteKey = DOMtools.returnElement({
             type: "div",
-            class_es: "delete",
+            class: "delete",
             text: "✖"
         });
         // deleteKey.addEventListener("click", submitAndRerender);
@@ -370,14 +379,15 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
     function createNotesBox(notes) { // send obj.notes
         const notesBox = DOMtools.returnElement({
             type: "textarea",
-            class_es: "textarea hidden",
+            class: "textarea hidden",
             text: notes,
             attribute: {
                 rows: "6",
                 spellcheck: "false"
             }
         })
-        notesBox.addEventListener("focusout", submit)
+        // notesBox.addEventListener("focusout", submit)
+        return notesBox;
     }
 
     // event listener functions
@@ -405,9 +415,10 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
 
     // draw list
 
-    if (projIndex) { // list of todos
+    if (projIndex !== null) { // list of todos
         array.forEach((obj, i) => {
-            const outerContainer = createContainer(obj, i).className = "box"; // overwrite class
+            const outerContainer = createContainer(obj, i)
+            outerContainer.className = "box"; // overwrite class
             const innerContainer = createContainer(obj, i);
             DOMtools.appendChildren(
                 innerContainer,
@@ -417,7 +428,7 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
                 createSelectBox(),
                 createNotesIcon(),
                 createImportantIcon(obj.important),
-                createDateInput(),
+                createDateInput(obj.dueDate),
                 createDeleteKey(),
             );
             DOMtools.appendChildren(
@@ -429,7 +440,8 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
         });
     } else { // list of projects
         array.forEach((obj, i) => {
-            const container = createContainer(obj, i).classList.add("box", "project");
+            const container = createContainer(obj, i);
+            container.classList.add("box", "project");
             DOMtools.appendChildren(
                 container,
                 createColorPicker(obj.color),
@@ -437,6 +449,24 @@ function renderList(panel, array, color, projIndex) { // last two parameters opt
                 createNameInput(obj.name),
                 createDeleteKey()
             )
+            panel.appendChild(container);
         });
     }
 }
+
+// render project bar works!
+
+const projectPanel = document.querySelector("#projectbar");
+const userProjects = todo.returnAll().slice(1);
+renderList(projectPanel, userProjects);
+
+// render task view works!
+
+const todoPanel = document.querySelector("#todoview");
+const allTodos = todo.returnAll();
+allTodos.forEach((project, i) => {
+    console.table(project.todos);
+    console.log(project.color);
+    console.log(i);
+    renderList(todoPanel, project.todos, project.color, i);
+})

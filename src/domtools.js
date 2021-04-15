@@ -25,18 +25,18 @@ const DOMtools = (function() {
         //     ]
 
         const newElement = document.createElement(obj.type);
-        if (obj.hasOwnProperty("class_es")) {
-            newElement.className = obj.class_es;
+        if (obj.hasOwnProperty("class")) {
+            newElement.className = obj.class;
         }
         if (obj.hasOwnProperty("text")) {
             newElement.innerHTML = obj.text;
         }
-        // if (obj.hasOwnProperty("attribute")) {
-        //     const entries = Object.entries(obj);
-        //     for (const [attr, value] of entries) {
-        //         newElement.setAttribute(attr, value);
-        //     };
-        // }
+        if (obj.hasOwnProperty("attribute")) {
+            const entries = Object.entries(obj.attribute);
+            for (const [attr, value] of entries) {
+                newElement.setAttribute(attr, value);
+            };
+        }
         return newElement;
     }
 
@@ -49,6 +49,9 @@ const DOMtools = (function() {
     }
 
     function appendChildren(parent, ...children) {
+        console.log("parent: ");
+        console.log(parent);
+        // children.forEach(child => console.log(child));
         children.forEach(child => parent.appendChild(child));
     }
 

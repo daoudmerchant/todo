@@ -1,7 +1,7 @@
 const todo = (function() {
     let projectArray = [
         {
-            name: "default",
+            name: "Default",
             color: "#000000",
             get complete() {
                 return _getCompleteStatus.call(this);

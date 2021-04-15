@@ -118,7 +118,7 @@ textarea:focus {
     color: red;
 }
 
-.complete > .text {
+.complete {
     color: rgba(0, 0, 0, 0.2);
     text-decoration: line-through;
 }
