@@ -118,7 +118,7 @@ const todo = (function() {
                     complete: true
                 },
                 {
-                    name: "Move to France",
+                    name: "Learn talk gud",
                     dueDate: undefined,
                     important: true,
                     notes: undefined,
@@ -131,7 +131,12 @@ const todo = (function() {
     // methods
 
     function _getCompleteStatus() {
-        let complete = true;
+        let complete;
+        if (this.todos.length === 0) {
+            complete = false;
+        } else {
+            complete = true;
+        }
         this.todos.forEach(todo => {
             if (todo.complete === false) {
                 complete = false;
@@ -164,7 +169,8 @@ const todo = (function() {
     // private functions
 
     function returnItem(projIndex, todoIndex = null) {
-        if (todoIndex) {
+        if (todoIndex !== null) {
+            console.log(projectArray[projIndex].todos[todoIndex]);
             return projectArray[projIndex].todos[todoIndex];
         } else {
             return projectArray[projIndex];
@@ -179,8 +185,8 @@ const todo = (function() {
         return projectArray.map(project => project.name);
     }
 
-    function addItem(name, projIndex) {
-        if (projIndex) {
+    function addItem(name, projIndex = null) {
+        if (projIndex !== null) {
             const newTodo = {
                 name,
                 dueDate: undefined,
@@ -188,7 +194,7 @@ const todo = (function() {
                 notes: undefined,
                 complete: false
             };
-            returnItem(projIndex).push(newTodo);
+            returnItem(projIndex).todos.push(newTodo);
         } else {
             const newProject = {
                 name,
@@ -207,14 +213,15 @@ const todo = (function() {
                 },
                 todos: []
             }
-            returnAll().push(newProject);
+            projectArray.push(newProject);
         };
         return projectArray;
     }
 
     function editItem(attr, value, projIndex, todoIndex = null) {
-        if (todoIndex) {
+        if (todoIndex !== null) {
             const thisTodo = returnItem(projIndex, todoIndex);
+            console.log(thisTodo);
             thisTodo[attr] = value;
         } else {
             const thisProj = returnItem(projIndex);
@@ -224,7 +231,7 @@ const todo = (function() {
     }
     
     function moveItem(oldProjIndex, newProjIndex, oldTodoIndex = null) {
-        if (oldTodoIndex) {
+        if (oldTodoIndex !== null) {
             const oldProj = returnItem(oldProjIndex);
             let movedTodo;
             [movedTodo] = oldProj.todos.splice(oldTodoIndex, 1);
@@ -234,10 +241,10 @@ const todo = (function() {
     }
 
     function deleteItem(projIndex, todoIndex = null) {
-        if (todoIndex) {
+        if (todoIndex !== null) {
             returnItem(projIndex).todos.splice(todoIndex, 1);
         } else {
-            returnAll().splice(projIndex, 1);
+            projectArray.splice(projIndex, 1);
         }
     };
 

@@ -43,6 +43,15 @@ body {
     margin: 2rem;
 }
 
+#projecthead {
+    cursor: auto;
+    border-top: 1px solid black;
+    padding-top: 2rem;
+    margin: 0 2rem;
+    font-size: 1.6rem;
+    font-weight: 400;
+}
+
 .container > * {
     margin: 10px;
 }

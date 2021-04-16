@@ -7,13 +7,15 @@ window.todo = todo;
 window.DOMtools = DOMtools;
 
 const submit = function(element) {
-
-    console.log("Submit running");
     const parent = element.parentElement;
 
-    const projIndex = Number(parent.dataset.projectindex);
-    const todoIndex = (parent.hasAttribute("data-todoindex")) ?
-        Number(parent.dataset.todoindex) : undefined;
+    const projIndex = (parent.dataset.projectindex === "null") ?
+        "null" : Number(parent.dataset.projectindex);
+    let todoIndex = undefined;
+    if (parent.hasAttribute("data-todoindex")) {
+        todoIndex = (parent.dataset.todoindex === "null") ?
+            "null" : Number(parent.dataset.todoindex);
+    }
 
     if (element.getAttribute("type") === "color") { // color input
         todo.editItem("color", element.value, projIndex + 1);
@@ -24,11 +26,11 @@ const submit = function(element) {
             todo.editItem("complete", false, projIndex, todoIndex);
         }
     } else if (element.getAttribute("type") === "text") { // text input
-        if (!todoIndex) { // no todo index attribute, is a new box
-            if (projIndex !== "null") { // project index, is a new todo
-                todo.addItem(element.value, projIndex);
-            } else { // no project index, is a new project
+        if (todoIndex === undefined) { // no todo index attribute, is a new box
+            if (projIndex === "null") { // no project index, is a new project
                 todo.addItem(element.value);
+            } else { // has numeric project index, is a new todo
+                todo.addItem(element.value, projIndex);
             }
         } else { // has own todo index attribute, is an edited box
             if (todoIndex === "null") { // is an edited project
@@ -45,7 +47,9 @@ const submit = function(element) {
     } else if (element.getAttribute("type") === "date") { // date box
         todo.editItem("dueDate", new Date(element.value), projIndex, todoIndex);
     } else if (element.textContent === "✖") { // delete button
-        if (todoIndex.toString() === "NaN") {
+        console.log(todoIndex);
+        console.log(projIndex);
+        if (todoIndex === "null") {
             if (confirm("Delete todo list?")) {
                 todo.deleteItem(projIndex + 1);
             }
@@ -55,9 +59,10 @@ const submit = function(element) {
             }
         }
     }
-    // else if (element.tagName === "TEXTAREA") { // notes
-    //     todo.editItem("notes", element.value, projIndex, todoIndex);
-    // }
+    else if (element.tagName === "TEXTAREA") { // notes
+        const notesText = (element.value) ? element.value : undefined;
+        todo.editItem("notes", notesText, projIndex, todoIndex);
+    }
 
 
 
@@ -124,11 +129,13 @@ const submit = function(element) {
     function _viewProject(i) {
         function _selectProject(index) {
             const projects = document.querySelectorAll(".project");
-            console.log(projects);
             const thisProjBar = projects.item(index - 1);
-            console.log(thisProjBar);
-            // thisProjBar.classList.add("selected")
+            thisProjBar.classList.add("selected")
         }
+            // Yes, I know ideally the class should be added at time of render, but
+            // I have to account for readability when renderList() already has many
+            // optional functions. This is an optional effect and can be easily
+            // removed here
         const thisProj = todo.returnItem(i);
         _renderPanel(todoPanel, renderList, thisProj.todos, thisProj.color, i)
         _selectProject(i);
@@ -163,7 +170,7 @@ const submit = function(element) {
                 }
             });
             container.appendChild(newNameInput);
-            // newNameInput.addEventListener("focusout", submit.name);
+            newNameInput.addEventListener("focusout", submitAndRerender);
             panel.appendChild(container);
         }
 
@@ -188,6 +195,11 @@ const submit = function(element) {
         array.forEach((project, i) => {
             renderList(panel, project[attr], project.color, i);
         });
+    }
+
+    function submitAndRerender() {
+        submit(this)
+        renderCurrent();
     }
 
 //     // To get default view:
@@ -279,6 +291,7 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
                 "data-todoindex": (projIndex !== null) ? i : "null"
             }
         });
+        // container.addEventListener("click", renderView);
         return container;
     }
 
@@ -322,12 +335,23 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
                 (color) ? `color:${color}` : `color:${obj.color}`
             )
         }
-        nameText.addEventListener("dblclick", toggleInput);
-        if (!projIndex) { // is a project
+        if (projIndex === null) { // project view
+            let timer = 0;
+            let prevent = false;
             nameText.addEventListener("click", e => {
-                console.log(e.target.parentElement);
-                renderView.call(e.target.parentElement);
+                timer = setTimeout(function() {
+                    if (!prevent) {
+                        renderView.call(e.target.parentElement);
+                    }
+                }, 200);
             });
+            nameText.addEventListener("dblclick", e => {
+                clearTimeout(timer);
+                prevent = true;
+                toggleInput(e.target);
+            });
+        } else {
+            nameText.addEventListener("click", toggleNotesAndSubmit)
         }
         return nameText;
     }
@@ -366,16 +390,6 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         })
         selectContainer.addEventListener("change", submitAndRerender);
         return selectContainer;
-    }
-
-    function createNotesIcon() {
-        const notesIcon = DOMtools.returnElement({
-            type: "p",
-            class: "notes",
-            text: "☰"
-        })
-        notesIcon.addEventListener("click", toggleNotesAndSubmit);
-        return notesIcon;
     }
 
     function createImportantIcon(importance) { // send obj.important
@@ -429,22 +443,22 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         const notesBox = DOMtools.returnElement({
             type: "textarea",
             class: "textarea hidden",
-            text: notes,
             attribute: {
                 rows: "6",
                 spellcheck: "false"
             }
         })
-        // notesBox.addEventListener("focusout", submit)
+        if (notes) {
+            notesBox.textContent = notes;
+        }
+        notesBox.addEventListener("focusout", e => submit(e.target));
+            // or get submit function to check if event or element
         return notesBox;
     }
 
     // event listener functions
 
-    function submitAndRerender() {
-        submit(this)
-        renderCurrent();
-    }
+
 
     function toggleNotesAndSubmit() {
         const notes = this.parentElement.parentElement.lastChild;
@@ -452,14 +466,14 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         if (notes.classList.contains("hidden")) { // click to reveal
             notes.classList.remove("hidden");
         } else { // click to hide and (submit contents)
-            // submit.call(notes); // (UNSURE)
+            submit(notes);
             notes.classList.add("hidden")
         }
     }
 
-    function toggleInput() {
-        this.classList.add("hidden");
-        const input = this.nextElementSibling;
+    function toggleInput(element) {
+        element.classList.add("hidden");
+        const input = element.nextElementSibling;
         input.classList.remove("hidden");
         input.focus();
         input.select();
@@ -478,7 +492,6 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
                 createName(obj),
                 createNameInput(obj.name),
                 createSelectBox(),
-                createNotesIcon(),
                 createImportantIcon(obj.important),
                 createDateInput(obj.dueDate),
                 createDeleteKey(),
@@ -505,3 +518,5 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         });
     }
 }
+
+renderCurrent();
