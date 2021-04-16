@@ -1,13 +1,13 @@
 const todo = (function() {
     let projectArray = [
         {
-            name: "Default",
+            name: "-- default --",
             color: "#000000",
             get complete() {
                 return _getCompleteStatus.call(this);
             },
-            get urgent() {
-                return _getUrgentTodos.call(this);
+            get important() {
+                return _getImportantTodos.call(this);
             },
             get dueThisWeek() {
                 return _getTodosDue.call(this);
@@ -149,8 +149,8 @@ const todo = (function() {
                 get complete() {
                     return _getCompleteStatus.call(this);
                 },
-                get urgent() {
-                    return _getUrgentTodos.call(this);
+                get important() {
+                    return _getImportantTodos.call(this);
                 },
                 get dueThisWeek() {
                     return _getTodosDue.call(this);

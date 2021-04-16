@@ -49,9 +49,6 @@ const DOMtools = (function() {
     }
 
     function appendChildren(parent, ...children) {
-        console.log("parent: ");
-        console.log(parent);
-        // children.forEach(child => console.log(child));
         children.forEach(child => parent.appendChild(child));
     }
 
@@ -59,9 +56,9 @@ const DOMtools = (function() {
         elements.forEach(element => element.addEventListener(fn));
     }
 
-    function clearAndRender(parent, callback, ...parameters) {
+    function clearAndRender(panel, callback, ...args) {
         // _emptyElement(parent);
-        callback(parent, ...parameters);
+        callback(panel, ...args);
     }
 
     return {

@@ -52,8 +52,8 @@ window.DOMtools = DOMtools;
 // const render = (function() {
 //     // panel element queries
 
-//     const projectPanel = document.querySelector("#projectbar");
-//     const todoPanel = document.querySelector("#todoview");
+    const projectPanel = document.querySelector("#projectbar");
+    const todoPanel = document.querySelector("#todoview");
 
 //     // permanent project element queries
 
@@ -71,74 +71,80 @@ window.DOMtools = DOMtools;
 
 //     // current render
 
-//     let _viewCurrent = _viewDefault;
+    let _viewCurrent = _viewDefault;
 
 //     // view render functions
 
-//     function _viewDefault() {
-//         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "todos");
-//         _viewCurrent = _viewDefault;
-//     }
+    function _viewDefault() {
+        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "todos");
+        _viewCurrent = _viewDefault;
+    }
 
-//     function _viewImportant() {
-//         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "important");
-//         _viewCurrent = _viewImportant;
-//     }
+    function _viewImportant() {
+        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "important");
+        _viewCurrent = _viewImportant;
+    }
 
-//     function _viewOverdue() {
-//         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "overdue");
-//         _viewCurrent = _viewOverdue;
-//     }
+    function _viewOverdue() {
+        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "overdue");
+        _viewCurrent = _viewOverdue;
+    }
 
-//     function _viewDueThisWeek() {
-//         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "dueThisWeek")
-//         _viewCurrent = _viewDueThisWeek;
-//     }
+    function _viewDueThisWeek() {
+        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "dueThisWeek")
+        _viewCurrent = _viewDueThisWeek;
+    }
 
-//     function _viewProject(i) {
-//         function _selectProject(index) {
-//             const projects = document.querySelectorAll(".project");
-//             projects.item(index - 1).classList.add("selected")
-//         }
-//         _renderPanel(todoPanel, renderList, todo.returnItem(i).todos, i, todo.returnItem(i).color)
-//         _selectProject(i);
-//         _viewCurrent = () => _viewProject(i);
-//     }
+    function _viewProject(i) {
+        function _selectProject(index) {
+            const projects = document.querySelectorAll(".project");
+            const thisProjBar = projects.item(index - 1);
+            thisProjBar.classList.add("selected")
+        }
+        const thisProj = todo.returnItem(i);
+        _renderPanel(todoPanel, renderList, thisProj.todos, thisProj.color, i)
+        _selectProject(i);
+        _viewCurrent = () => _viewProject(i);
+    }
 
-//     function _viewProjectList() {
-//         _renderPanel(projectPanel, renderList, todo.returnAll());
-//     }
+    function _viewProjectList() {
+        const userProjects = todo.returnAll().slice(1);
+        _renderPanel(projectPanel, renderList, userProjects);
+    }
 
 //     // page rendering functions
 
-//     function _renderPanel(panel, ...args) { // runs function and adds new box
+    function _renderPanel(panel, callback, ...args) { // runs function and adds new box
         
-//         function _addNewButton(panel, index = undefined) {
-//             const container = DOMtools.returnElement({
-//                 type: "div",
-//                 class_es: "box container new"
-//             });
-//             const newNameInput = DOMtools.returnElement({
-//                 type: "input",
-//                 class_es: "text textinput",
-//                 attribute: {
-//                     type: "text",
-//                     placeholder: "+ add new",
-//                     "data-projectindex": index
-//                 }
-//             });
-//             newNameInput.addEventListener("focusout", submit.name);
-//             panel.appendChild(container);
-//         }
+        function _addNewButton(panel, index = undefined) {
+            const container = DOMtools.returnElement({
+                type: "div",
+                class: "box container new"
+            });
+            const newNameInput = DOMtools.returnElement({
+                type: "input",
+                class: "text textinput",
+                attribute: {
+                    type: "text",
+                    placeholder: "+ add new",
+                    spellcheck: "false",
+                    "data-projectindex": index
+                }
+            });
+            container.appendChild(newNameInput);
+            console.log(container);
+            // newNameInput.addEventListener("focusout", submit.name);
+            panel.appendChild(container);
+        }
 
-//         DOMtools.clearAndRender(panel, ...args);
-//         const lastArg = args[args.length - 1];
-//         if (typeof(lastArg) === "number") { // is an index
-//             _addNewButton(panel, lastArg)
-//         } else {
-//             _addNewButton(panel);
-//         }
-//     }
+        DOMtools.clearAndRender(panel, callback, ...args);
+        const lastArg = args[args.length - 1];
+        if (typeof(lastArg) === "string") { // rendering multiple projects
+            _addNewButton(panel, 0)
+        } else {
+            _addNewButton(panel);
+        }
+    }
 
 //     // projectPanel or to view specific project, e.g.
 //     //   _renderPanel(todoPanel, renderList, projectArray[1].todos, 1)
@@ -146,9 +152,9 @@ window.DOMtools = DOMtools;
 //     //   _renderPanel(projectPanel, renderList, projectArray)
 //     //      - renders project panel
 
-//     function renderAllLists(panel, array, attr) {
-//         array.forEach((project, i) => renderList(panel, project[attr], project.color, i))
-//     }
+    function renderAllLists(panel, array, attr) {
+        array.forEach((project, i) => renderList(panel, project[attr], project.color, i));
+    }
 
 //     // To get default view:
     
@@ -193,32 +199,32 @@ window.DOMtools = DOMtools;
 
 //     // public
 
-//     function renderView(element) {
-//         _viewProjectList(); // always redraw project bar
-//         if (element.hasAttribute("id")) { // not a project
-//             switch (element.id) {
-//                 case "default" :
-//                     _viewDefault();
-//                     break;
-//                 case "important" :
-//                     _viewImportant();
-//                     break;
-//                 case "overdue" :
-//                     _viewOverdue();
-//                     break;
-//                 case "duethisweek" :
-//                     _viewDueThisWeek();
-//                     break;
-//             }
-//         } else { // is project
-//             _viewProject(element.dataset.projectindex);
-//         }
-//     }
+    function renderView(element) {
+        _viewProjectList(); // always redraw project bar
+        if (element.hasAttribute("id")) { // not a project
+            switch (element.id) {
+                case "default" :
+                    _viewDefault();
+                    break;
+                case "important" :
+                    _viewImportant();
+                    break;
+                case "overdue" :
+                    _viewOverdue();
+                    break;
+                case "duethisweek" :
+                    _viewDueThisWeek();
+                    break;
+            }
+        } else { // is project
+            _viewProject(element.dataset.projectindex);
+        }
+    }
 
-//     function renderCurrent() {
-//         _viewProjectList();
-//         _viewCurrent()
-//     }
+    function renderCurrent() {
+        _viewProjectList();
+        _viewCurrent()
+    }
 
 //     return {
 //         renderView,
@@ -238,13 +244,6 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
                 "data-projectindex": (projIndex) ? projIndex : i
             }
         });
-        // test 1
-        // container.setAttribute("data-projectindex", (projIndex) ? projIndex : i);
-        // test 2
-        // DOMtools.setAttributes(container, {
-        //     "data-projectindex": (projIndex) ? projIndex : i
-        // });
-        //
         if (projIndex !== null) {
             container.setAttribute("data-todoindex", i);
         }
@@ -352,7 +351,10 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         return importantIcon;
     }
 
-    function createDateInput(date) {
+    function createDateInput(date = null) {
+        function make2Decimals(num) {
+            return num.toString().padStart(2, "0");
+        };
         const dateInput = DOMtools.returnElement({
             type: "input",
             class: "textinput",
@@ -361,7 +363,12 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
             }
         });
         if (date) {
-            dateInput.setAttribute("value", date);
+            dateInput.setAttribute(
+                "value",
+                (date.getFullYear() + "-" +
+                make2Decimals(date.getMonth()) + "-" +
+                make2Decimals(date.getDate()))
+            );
         }
         return dateInput
     }
@@ -454,19 +461,21 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
     }
 }
 
-// render project bar works!
+// // render project bar works!
 
-const projectPanel = document.querySelector("#projectbar");
-const userProjects = todo.returnAll().slice(1);
-renderList(projectPanel, userProjects);
+// const projectPanel = document.querySelector("#projectbar");
+// const userProjects = todo.returnAll().slice(1);
+// renderList(projectPanel, userProjects);
 
-// render task view works!
+// // render task view works!
 
-const todoPanel = document.querySelector("#todoview");
-const allTodos = todo.returnAll();
-allTodos.forEach((project, i) => {
-    console.table(project.todos);
-    console.log(project.color);
-    console.log(i);
-    renderList(todoPanel, project.todos, project.color, i);
-})
+// const todoPanel = document.querySelector("#todoview");
+// const allTodos = todo.returnAll();
+// allTodos.forEach((project, i) => {
+//     console.table(project.todos);
+//     console.log(project.color);
+//     console.log(i);
+//     renderList(todoPanel, project.todos, project.color, i);
+// })
+
+renderCurrent();
