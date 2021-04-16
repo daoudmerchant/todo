@@ -6,74 +6,100 @@ import DOMtools from "./domtools.js";
 window.todo = todo;
 window.DOMtools = DOMtools;
 
-// const submit = function(element) {
+const submit = function(element) {
 
-//     function name() {
-//         const newName = this.value;
-//         const projIndex = this.dataset.projectindex;
-//         if (!this.hasAttribute("data-todoindex")) { // no todo index attribute, is a new box
-//             if (projIndex) { // project index, is a new todo
-//                 todo.addItem(newName, projIndex);
-//             } else { // no project index, is a new project
-//                 todo.addItem(newName);
-//             }
-//         } else { // has own todo index attribute, is an edited box
-//             const todoIndex = this.dataset.todoindex;
-//             if (todoIndex) { // has valid todo index, is an edited todo
-//                 todo.editItem("name", newName, projIndex, todoIndex);
-//             } else { // has todo index attribute of null, is an edited project
-//                 todo.editItem("name", newName, projIndex);
-//             }
-//         }
-//     };
+    console.log("Submit running");
+    const parent = element.parentElement;
 
-//     function deletion() {
-//         if (this.hasAttribute("data-todoindex")) {
-//             todo.deleteItem(this.dataset.projectindex, this.dataset.todoindex);
-//         } else {
-//             todo.deleteItem(this.dataset.projectindex);
-//         }
-//     }
+    const projIndex = Number(parent.dataset.projectindex);
+    const todoIndex = (parent.hasAttribute("data-todoindex")) ?
+        Number(parent.dataset.todoindex) : undefined;
 
-//     function completion() {
+    if (element.getAttribute("type") === "color") { // color input
+        todo.editItem("color", element.value, projIndex + 1);
+    } else if (element.getAttribute("type") === "checkbox") { // checkbox
+        if (element.checked) {
+            todo.editItem("complete", true, projIndex, todoIndex);
+        } else {
+            todo.editItem("complete", false, projIndex, todoIndex);
+        }
+    } else if (element.getAttribute("type") === "text") { // text input
+        if (!todoIndex) { // no todo index attribute, is a new box
+            if (projIndex !== "null") { // project index, is a new todo
+                todo.addItem(element.value, projIndex);
+            } else { // no project index, is a new project
+                todo.addItem(element.value);
+            }
+        } else { // has own todo index attribute, is an edited box
+            if (todoIndex === "null") { // is an edited project
+                todo.editItem("name", element.value, (projIndex + 1));
+            } else { // has valid todo index, is an edited todo
+                todo.editItem("name", element.value, projIndex, todoIndex);
+            }
+        }
+    } else if (element.tagName === "SELECT") { // select box
+        todo.moveItem(projIndex, element.value, todoIndex);
+    } else if (element.textContent === "!") {
+        const newImportance = (element.dataset.importance !== "true");
+        todo.editItem("important", newImportance, projIndex, todoIndex);
+    } else if (element.getAttribute("type") === "date") { // date box
+        todo.editItem("dueDate", new Date(element.value), projIndex, todoIndex);
+    } else if (element.textContent === "✖") { // delete button
+        if (todoIndex.toString() === "NaN") {
+            if (confirm("Delete todo list?")) {
+                todo.deleteItem(projIndex + 1);
+            }
+        } else {
+            if (confirm("Delete todo item?")) {
+                todo.deleteItem(projIndex, todoIndex);
+            }
+        }
+    }
+    // else if (element.tagName === "TEXTAREA") { // notes
+    //     todo.editItem("notes", element.value, projIndex, todoIndex);
+    // }
 
-//     }
 
-//     function projectChange() {
 
-//     }
-
-//     function color() {
-
-//     }
-
-// }
+    // new project container:
+    //  - project index: undefined
+    //  - no todo index
+    // new todo container:
+    //  - project index: always something, even 0
+    //  - no todo index
+    // edited project container:
+    //  - project-index: index of project - 1
+    //  - todo index of "null"
+    // edited todo container:
+    //  - project index: index
+    //  - todo index: index
+}
 
 // const render = (function() {
-//     // panel element queries
+    // panel element queries
 
     const projectPanel = document.querySelector("#projectbar");
     const todoPanel = document.querySelector("#todoview");
 
-//     // permanent project element queries
+    // permanent project element queries
 
-//     const defaultView = document.querySelector("#default");
-//     const importantView = document.querySelector("#important");
-//     const overdueView = document.querySelector("#overdue");
-//     const thisWeekView = document.querySelector("#duethisweek");
+    const defaultView = document.querySelector("#default");
+    const importantView = document.querySelector("#important");
+    const overdueView = document.querySelector("#overdue");
+    const thisWeekView = document.querySelector("#duethisweek");
 
-//     // attached event listeners
+    // attached event listeners
 
-//     defaultView.addEventListener("click", _viewDefault);
-//     importantView.addEventListener("click", _viewImportant);
-//     overdueView.addEventListener("click", _viewOverdue);
-//     thisWeekView.addEventListener("click", _viewDueThisWeek);
+    defaultView.addEventListener("click", renderView);
+    importantView.addEventListener("click", renderView);
+    overdueView.addEventListener("click", renderView);
+    thisWeekView.addEventListener("click", renderView);
 
-//     // current render
+    // current render
 
     let _viewCurrent = _viewDefault;
 
-//     // view render functions
+    // view render functions
 
     function _viewDefault() {
         _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "todos");
@@ -98,8 +124,10 @@ window.DOMtools = DOMtools;
     function _viewProject(i) {
         function _selectProject(index) {
             const projects = document.querySelectorAll(".project");
+            console.log(projects);
             const thisProjBar = projects.item(index - 1);
-            thisProjBar.classList.add("selected")
+            console.log(thisProjBar);
+            // thisProjBar.classList.add("selected")
         }
         const thisProj = todo.returnItem(i);
         _renderPanel(todoPanel, renderList, thisProj.todos, thisProj.color, i)
@@ -109,17 +137,21 @@ window.DOMtools = DOMtools;
 
     function _viewProjectList() {
         const userProjects = todo.returnAll().slice(1);
+        console.log(typeof(userProjects));
         _renderPanel(projectPanel, renderList, userProjects);
     }
 
-//     // page rendering functions
+    // page rendering functions
 
     function _renderPanel(panel, callback, ...args) { // runs function and adds new box
         
-        function _addNewButton(panel, index = undefined) {
+        function _addNewButton(panel, index = null) {
             const container = DOMtools.returnElement({
                 type: "div",
-                class: "box container new"
+                class: "box container new",
+                attribute: {
+                    "data-projectindex": index
+                }
             });
             const newNameInput = DOMtools.returnElement({
                 type: "input",
@@ -128,20 +160,20 @@ window.DOMtools = DOMtools;
                     type: "text",
                     placeholder: "+ add new",
                     spellcheck: "false",
-                    "data-projectindex": index
                 }
             });
             container.appendChild(newNameInput);
-            console.log(container);
             // newNameInput.addEventListener("focusout", submit.name);
             panel.appendChild(container);
         }
 
         DOMtools.clearAndRender(panel, callback, ...args);
         const lastArg = args[args.length - 1];
-        if (typeof(lastArg) === "string") { // rendering multiple projects
+        if (lastArg === "todos") { // default view
             _addNewButton(panel, 0)
-        } else {
+        } else if (typeof(lastArg) === "number") { // view a project
+            _addNewButton(panel, lastArg);
+        } else if (typeof(lastArg) === "object") { // project bar
             _addNewButton(panel);
         }
     }
@@ -153,7 +185,9 @@ window.DOMtools = DOMtools;
 //     //      - renders project panel
 
     function renderAllLists(panel, array, attr) {
-        array.forEach((project, i) => renderList(panel, project[attr], project.color, i));
+        array.forEach((project, i) => {
+            renderList(panel, project[attr], project.color, i);
+        });
     }
 
 //     // To get default view:
@@ -199,10 +233,10 @@ window.DOMtools = DOMtools;
 
 //     // public
 
-    function renderView(element) {
+    function renderView() {
         _viewProjectList(); // always redraw project bar
-        if (element.hasAttribute("id")) { // not a project
-            switch (element.id) {
+        if (this.hasAttribute("id")) { // not a project
+            switch (this.id) {
                 case "default" :
                     _viewDefault();
                     break;
@@ -217,7 +251,7 @@ window.DOMtools = DOMtools;
                     break;
             }
         } else { // is project
-            _viewProject(element.dataset.projectindex);
+            _viewProject(Number(this.dataset.projectindex) + 1);
         }
     }
 
@@ -236,17 +270,15 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
 
     // element creation functions
 
-    function createContainer(obj, i) {
+    function createContainer(i) {
         const container = DOMtools.returnElement({
             type: "div",
             class: "container",
             attribute: {
-                "data-projectindex": (projIndex) ? projIndex : i
+                "data-projectindex": (projIndex !== null) ? projIndex : i,
+                "data-todoindex": (projIndex !== null) ? i : "null"
             }
         });
-        if (projIndex !== null) {
-            container.setAttribute("data-todoindex", i);
-        }
         return container;
     }
 
@@ -258,7 +290,7 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
                 value: color
             }
         });
-        // colorPicker.addEventListener("input", submitAndRerender)
+        colorPicker.addEventListener("change", submitAndRerender)
         return colorPicker;
     }
 
@@ -272,6 +304,7 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         if (complete) {
             checkbox.checked = "true"
         }
+        checkbox.addEventListener("change", submitAndRerender);
         return checkbox;
     }
 
@@ -289,15 +322,18 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
                 (color) ? `color:${color}` : `color:${obj.color}`
             )
         }
-        // nameText.addEventListener("dblclick", toggleInput)
-        // if (!projIndex) { // is a project
-            // nameText.addEventListener("click", render.renderView(this));
-        // }
+        nameText.addEventListener("dblclick", toggleInput);
+        if (!projIndex) { // is a project
+            nameText.addEventListener("click", e => {
+                console.log(e.target.parentElement);
+                renderView.call(e.target.parentElement);
+            });
+        }
         return nameText;
     }
 
     function createNameInput(name) { // send obj.name
-        const nameText = DOMtools.returnElement({
+        const nameInput = DOMtools.returnElement({
             type: "input",
             class: "text textinput hidden",
             attribute: {
@@ -306,8 +342,8 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
                 value: name
             }
         });
-
-        return nameText;
+        nameInput.addEventListener("focusout", submitAndRerender);
+        return nameInput;
     }
 
     function createSelectBox() {
@@ -328,6 +364,7 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
             }
             selectContainer.appendChild(option);
         })
+        selectContainer.addEventListener("change", submitAndRerender);
         return selectContainer;
     }
 
@@ -337,7 +374,7 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
             class: "notes",
             text: "☰"
         })
-        // notesIcon.addEventListener("click", toggleNotesAndSubmit);
+        notesIcon.addEventListener("click", toggleNotesAndSubmit);
         return notesIcon;
     }
 
@@ -345,9 +382,13 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         const importantIcon = DOMtools.returnElement({
             type: "p",
             class: (importance) ? "importance urgent" : "importance",
-            text: "!"
+            text: "!",
+
         });
-        // add event listner
+        if (importance) {
+            importantIcon.setAttribute("data-importance", "true");
+        }
+        importantIcon.addEventListener("click", submitAndRerender);
         return importantIcon;
     }
 
@@ -370,6 +411,7 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
                 make2Decimals(date.getDate()))
             );
         }
+        dateInput.addEventListener("input", submitAndRerender);
         return dateInput
     }
 
@@ -379,7 +421,7 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
             class: "delete",
             text: "✖"
         });
-        // deleteKey.addEventListener("click", submitAndRerender);
+        deleteKey.addEventListener("click", submitAndRerender);
         return deleteKey;
     };
 
@@ -399,34 +441,37 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
 
     // event listener functions
 
-    // function submitAndRerender() {
-    //     submit(this);
-    //     render.renderCurrent();
-    // }
+    function submitAndRerender() {
+        submit(this)
+        renderCurrent();
+    }
 
     function toggleNotesAndSubmit() {
-        const notes = this.parentElement.lastChild;
+        const notes = this.parentElement.parentElement.lastChild;
 
         if (notes.classList.contains("hidden")) { // click to reveal
             notes.classList.remove("hidden");
         } else { // click to hide and (submit contents)
-            submit.call(notes); // (UNSURE)
+            // submit.call(notes); // (UNSURE)
             notes.classList.add("hidden")
         }
     }
 
     function toggleInput() {
         this.classList.add("hidden");
-        this.nextElementSibling.classList.remove("hidden");
+        const input = this.nextElementSibling;
+        input.classList.remove("hidden");
+        input.focus();
+        input.select();
     }
 
     // draw list
 
     if (projIndex !== null) { // list of todos
         array.forEach((obj, i) => {
-            const outerContainer = createContainer(obj, i)
+            const outerContainer = createContainer(i)
             outerContainer.className = "box"; // overwrite class
-            const innerContainer = createContainer(obj, i);
+            const innerContainer = createContainer(i);
             DOMtools.appendChildren(
                 innerContainer,
                 createCheckbox(obj.complete),
@@ -447,7 +492,7 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         });
     } else { // list of projects
         array.forEach((obj, i) => {
-            const container = createContainer(obj, i);
+            const container = createContainer(i);
             container.classList.add("box", "project");
             DOMtools.appendChildren(
                 container,
@@ -460,22 +505,3 @@ function renderList(panel, array, color = null, projIndex = null) { // last two 
         });
     }
 }
-
-// // render project bar works!
-
-// const projectPanel = document.querySelector("#projectbar");
-// const userProjects = todo.returnAll().slice(1);
-// renderList(projectPanel, userProjects);
-
-// // render task view works!
-
-// const todoPanel = document.querySelector("#todoview");
-// const allTodos = todo.returnAll();
-// allTodos.forEach((project, i) => {
-//     console.table(project.todos);
-//     console.log(project.color);
-//     console.log(i);
-//     renderList(todoPanel, project.todos, project.color, i);
-// })
-
-renderCurrent();

@@ -2,11 +2,6 @@
 // before the React module
 
 const DOMtools = (function() {
-    function _emptyElement(parent) {
-        while (parent.firstChild) {
-            parent.remove(parent.lastChild);
-        }
-    }
 
     function returnElement(obj) {
 
@@ -45,7 +40,6 @@ const DOMtools = (function() {
         for (const [attr, value] of entries) {
             element.setAttribute(attr, value);
         }
-        // return element;
     }
 
     function appendChildren(parent, ...children) {
@@ -57,7 +51,7 @@ const DOMtools = (function() {
     }
 
     function clearAndRender(panel, callback, ...args) {
-        // _emptyElement(parent);
+        panel.innerHTML = "";
         callback(panel, ...args);
     }
 

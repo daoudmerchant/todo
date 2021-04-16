@@ -61,7 +61,7 @@ input[type="color"], input[type="checkbox"] {
     width: 50%
 }
 
-.name {
+.name, .importance, .delete {
     user-select: none;
 }
 

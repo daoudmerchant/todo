@@ -78,6 +78,53 @@ const todo = (function() {
                     complete: false
                 }
             ]
+        },
+        {
+
+            name: "Learn French",
+            color: "#f57e42",
+            get complete() {
+                return _getCompleteStatus.call(this);
+            },
+            get important() {
+                return _getImportantTodos.call(this);
+            },
+            get dueThisWeek() {
+                return _getTodosDue.call(this);
+            },
+            get overdue() {
+                return _getOverdueTodos.call(this);
+            },
+            todos: [
+                {
+                    name: "Learn verbs",
+                    dueDate: new Date(2021, 7, 5),
+                    important: true,
+                    notes: "Put the socks in the drawers, generally sort it out",
+                    complete: false
+                },
+                {
+                    name: "Learn nouns",
+                    dueDate: new Date(2021, 7, 5),
+                    important: false,
+                    notes: "Put everything in those little baggies",
+                    complete: false
+                },
+                {
+                    name: "Learn adjectives",
+                    dueDate: new Date(2021, 3, 9),
+                    important: true,
+                    notes: "Put the socks in the drawers, generally sort it out",
+                    complete: true
+                },
+                {
+                    name: "Move to France",
+                    dueDate: undefined,
+                    important: true,
+                    notes: undefined,
+                    complete: false
+                }
+            ]
         }
     ];
 
@@ -116,7 +163,7 @@ const todo = (function() {
 
     // private functions
 
-    function returnItem(projIndex, todoIndex) {
+    function returnItem(projIndex, todoIndex = null) {
         if (todoIndex) {
             return projectArray[projIndex].todos[todoIndex];
         } else {
@@ -165,30 +212,33 @@ const todo = (function() {
         return projectArray;
     }
 
-    function editItem(attr, value, projIndex, todoIndex) {
+    function editItem(attr, value, projIndex, todoIndex = null) {
         if (todoIndex) {
-            _returnItem(projIndex, todoIndex)[attr] = value;
+            const thisTodo = returnItem(projIndex, todoIndex);
+            thisTodo[attr] = value;
         } else {
-            _returnItem(projIndex)[attr] = value;
+            const thisProj = returnItem(projIndex);
+            thisProj[attr] = value;
         }
         return projectArray;
     }
     
-    function moveItem(oldProjIndex, newProjIndex, oldTodoIndex,) {
+    function moveItem(oldProjIndex, newProjIndex, oldTodoIndex = null) {
         if (oldTodoIndex) {
-            const movedTodo = _returnItem(oldProjIndex).todos.splice(oldTodoIndex, 1);
-            returnItem(newProjIndex).todos.push(movedTodo);
+            const oldProj = returnItem(oldProjIndex);
+            let movedTodo;
+            [movedTodo] = oldProj.todos.splice(oldTodoIndex, 1);
+            const newProj = returnItem(newProjIndex);
+            newProj.todos.push(movedTodo);
         } // else { some code down the line to reorder projects }
-        return projectArray; // or not?
     }
 
-    function deleteItem(projIndex, todoIndex) {
+    function deleteItem(projIndex, todoIndex = null) {
         if (todoIndex) {
             returnItem(projIndex).todos.splice(todoIndex, 1);
         } else {
             returnAll().splice(projIndex, 1);
         }
-        return projectArray; // or not?
     };
 
     // return functions
