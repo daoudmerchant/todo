@@ -138,10 +138,6 @@ textarea:focus {
     text-decoration: line-through;
 }
 
-.new:first-child {
-    width: 100%;
-}
-
 .hidden {
     display: none;
 }

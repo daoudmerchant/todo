@@ -78,6 +78,14 @@ const render = (function() {
         _viewCurrent()
     }
 
+    function setCurrent(i = null) {
+        if (i !== null) {
+            _viewCurrent = () => _viewProject(i);
+        } else {
+            _viewCurrent = _viewDefault;
+        }
+    }
+
     // Render other specific views:
 
     // - project bar
@@ -118,6 +126,7 @@ const render = (function() {
         function _selectProject(index) {
             const projects = document.querySelectorAll(".project");
             const thisProjBar = projects.item(index - 1);
+            console.log(thisProjBar);
             thisProjBar.classList.add("selected")
         }
             // Yes, I know ideally the class should be added at time of render, but
@@ -139,6 +148,7 @@ const render = (function() {
     // - required both when rendering a list AND when adding a new button
      
     function submitAndRerender() {
+        if (this.value === "") { return };
         submit(this)
         renderCurrent();
     }
@@ -172,7 +182,7 @@ const render = (function() {
 
         DOMtools.clearAndRender(panel, callback, ...args);
         const lastArg = args[args.length - 1];
-        if (lastArg === "todos") { // default view
+        if ((lastArg === "outstanding") || (lastArg === "todos")) { // view outstanding or all
             _addNewButton(panel, 0)
         } else if (typeof(lastArg) === "number") { // view a project
             _addNewButton(panel, lastArg);
@@ -316,7 +326,7 @@ const render = (function() {
             return importantIcon;
         }
         
-        function createDateInput(date = null) {
+        function createDateInput(date) {
             function make2Decimals(num) {
                 return num.toString().padStart(2, "0");
             };
@@ -431,6 +441,7 @@ const render = (function() {
     
     return {
         renderCurrent,
+        setCurrent
     }
 
 })();
@@ -440,6 +451,7 @@ const render = (function() {
 
 // - queries attached element
 // - submits relevant information to relevant todo module function
+// - updates local storage
 // requires todo module
 
 
@@ -478,8 +490,8 @@ function submit(element) {
             //  - todo index: index
 
         if (todoIndex === undefined) { // no todo index attribute, is a new box
-            if (projIndex === "null") { // no project index, is a new project
-                todo.addItem(element.value);
+            if (projIndex === "null") { // no project index, is a new project;
+                render.setCurrent(todo.addItem(element.value));
             } else { // has numeric project index, is a new todo
                 todo.addItem(element.value, projIndex);
             }
@@ -503,6 +515,7 @@ function submit(element) {
         if (todoIndex === "null") {
             if (confirm("Delete todo list?")) {
                 todo.deleteItem(projIndex + 1);
+                render.setCurrent()
             }
         } else {
             if (confirm("Delete todo item?")) {
@@ -514,8 +527,19 @@ function submit(element) {
         const notesText = (element.value) ? element.value : undefined;
         todo.editItem("notes", notesText, projIndex, todoIndex);
     }
+
+    // update local storage
+
+    localStorage.setItem('user', JSON.stringify(todo.exportAll()));
 }
 
 // on page load
 
-render.renderCurrent();
+(function() {
+    const userData = JSON.parse(localStorage.getItem('user'))
+    console.table(userData);
+    if (userData) {
+        todo.importAll(userData);
+    }
+    render.renderCurrent();
+})();

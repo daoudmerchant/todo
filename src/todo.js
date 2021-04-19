@@ -19,122 +19,122 @@ const todo = (function() {
                 return _getOverdueTodos.call(this);
             },
             todos: [
-                {
-                    name: "Buy the groceries",
-                    dueDate: new Date(2021, 6, 14),
-                    important: true,
-                    notes: "Get a bunch of yummy food",
-                    complete: false
-                },
-                {
-                    name: "Wash the car",
-                    dueDate: undefined,
-                    important: false,
-                    notes: undefined,
-                    complete: false
-                }
+        //         {
+        //             name: "Buy the groceries",
+        //             dueDate: new Date(2021, 6, 14),
+        //             important: true,
+        //             notes: "Get a bunch of yummy food",
+        //             complete: false
+        //         },
+        //         {
+        //             name: "Wash the dog",
+        //             dueDate: undefined,
+        //             important: false,
+        //             notes: undefined,
+        //             complete: false
+        //         }
             ]
         },
-        {
+        // {
 
-            name: "Do the cleaning",
-            color: "#4245f5",
-            get outstanding() {
-                return _getOutstandingTodos.call(this);
-            },
-            get complete() {
-                return _getCompleteStatus.call(this);
-            },
-            get important() {
-                return _getImportantTodos.call(this);
-            },
-            get dueThisWeek() {
-                return _getTodosDue.call(this);
-            },
-            get overdue() {
-                return _getOverdueTodos.call(this);
-            },
-            todos: [
-                {
-                    name: "Tidy up my room",
-                    dueDate: new Date(2021, 3, 21),
-                    important: true,
-                    notes: "Put the socks in the drawers, generally sort it out",
-                    complete: false
-                },
-                {
-                    name: "Do the laundry",
-                    dueDate: new Date(2021, 7, 5),
-                    important: false,
-                    notes: "Put everything in those little baggies",
-                    complete: false
-                },
-                {
-                    name: "Wash the dishes",
-                    dueDate: new Date(2021, 3, 9),
-                    important: true,
-                    notes: "Put the socks in the drawers, generally sort it out",
-                    complete: true
-                },
-                {
-                    name: "Vacuum clean",
-                    dueDate: undefined,
-                    important: true,
-                    notes: undefined,
-                    complete: false
-                }
-            ]
-        },
-        {
+        //     name: "Do the cleaning",
+        //     color: "#4245f5",
+        //     get outstanding() {
+        //         return _getOutstandingTodos.call(this);
+        //     },
+        //     get complete() {
+        //         return _getCompleteStatus.call(this);
+        //     },
+        //     get important() {
+        //         return _getImportantTodos.call(this);
+        //     },
+        //     get dueThisWeek() {
+        //         return _getTodosDue.call(this);
+        //     },
+        //     get overdue() {
+        //         return _getOverdueTodos.call(this);
+        //     },
+        //     todos: [
+        //         {
+        //             name: "Tidy up my room",
+        //             dueDate: new Date(2021, 3, 21),
+        //             important: true,
+        //             notes: "Put the socks in the drawers, generally sort it out",
+        //             complete: false
+        //         },
+        //         {
+        //             name: "Do the laundry",
+        //             dueDate: new Date(2021, 7, 5),
+        //             important: false,
+        //             notes: "Put everything in those little baggies",
+        //             complete: false
+        //         },
+        //         {
+        //             name: "Wash the dishes",
+        //             dueDate: new Date(2021, 3, 9),
+        //             important: true,
+        //             notes: "Put the socks in the drawers, generally sort it out",
+        //             complete: true
+        //         },
+        //         {
+        //             name: "Vacuum clean",
+        //             dueDate: undefined,
+        //             important: true,
+        //             notes: undefined,
+        //             complete: false
+        //         }
+        //     ]
+        // },
+        // {
 
-            name: "Learn French",
-            color: "#f57e42",
-            get outstanding() {
-                return _getOutstandingTodos.call(this);
-            },
-            get complete() {
-                return _getCompleteStatus.call(this);
-            },
-            get important() {
-                return _getImportantTodos.call(this);
-            },
-            get dueThisWeek() {
-                return _getTodosDue.call(this);
-            },
-            get overdue() {
-                return _getOverdueTodos.call(this);
-            },
-            todos: [
-                {
-                    name: "Learn verbs",
-                    dueDate: new Date(2021, 7, 5),
-                    important: true,
-                    notes: "Put the socks in the drawers, generally sort it out",
-                    complete: false
-                },
-                {
-                    name: "Learn nouns",
-                    dueDate: new Date(2021, 7, 5),
-                    important: false,
-                    notes: "Put everything in those little baggies",
-                    complete: false
-                },
-                {
-                    name: "Learn adjectives",
-                    dueDate: new Date(2021, 3, 9),
-                    important: true,
-                    notes: "Put the socks in the drawers, generally sort it out",
-                    complete: true
-                },
-                {
-                    name: "Learn talk gud",
-                    dueDate: undefined,
-                    important: true,
-                    notes: undefined,
-                    complete: false
-                }
-            ]
-        }
+        //     name: "Learn French",
+        //     color: "#f57e42",
+        //     get outstanding() {
+        //         return _getOutstandingTodos.call(this);
+        //     },
+        //     get complete() {
+        //         return _getCompleteStatus.call(this);
+        //     },
+        //     get important() {
+        //         return _getImportantTodos.call(this);
+        //     },
+        //     get dueThisWeek() {
+        //         return _getTodosDue.call(this);
+        //     },
+        //     get overdue() {
+        //         return _getOverdueTodos.call(this);
+        //     },
+        //     todos: [
+        //         {
+        //             name: "Learn verbs",
+        //             dueDate: new Date(2021, 7, 5),
+        //             important: true,
+        //             notes: "Put the socks in the drawers, generally sort it out",
+        //             complete: false
+        //         },
+        //         {
+        //             name: "Learn nouns",
+        //             dueDate: new Date(2021, 7, 5),
+        //             important: false,
+        //             notes: "Put everything in those little baggies",
+        //             complete: false
+        //         },
+        //         {
+        //             name: "Learn adjectives",
+        //             dueDate: new Date(2021, 3, 9),
+        //             important: true,
+        //             notes: "Put the socks in the drawers, generally sort it out",
+        //             complete: true
+        //         },
+        //         {
+        //             name: "Learn talk gud",
+        //             dueDate: undefined,
+        //             important: true,
+        //             notes: undefined,
+        //             complete: false
+        //         }
+        //     ]
+        // }
     ];
 
     // methods
@@ -179,7 +179,7 @@ const todo = (function() {
         return this.todos.filter(todo => todo.dueDate < today);
     };
 
-    // private functions
+    // public functions
 
     function returnItem(projIndex, todoIndex = null) {
         if (todoIndex !== null) {
@@ -192,6 +192,55 @@ const todo = (function() {
 
     function returnAll() {
         return projectArray
+    }
+
+    function exportAll() {
+        const exportArray = projectArray.map(project => {
+            return ({
+                name: project.name,
+                color: project.color,
+                todos: project.todos
+            })
+        })
+        console.log(exportArray);
+        return exportArray;
+    }
+
+    function importAll(userArray) {
+        console.log(userArray);
+        const importArray = userArray.map(project => {
+            return ({
+                name: project.name,
+                color: project.color,
+                get outstanding() {
+                    return _getOutstandingTodos.call(this);
+                },
+                get complete() {
+                    return _getCompleteStatus.call(this);
+                },
+                get important() {
+                    return _getImportantTodos.call(this);
+                },
+                get dueThisWeek() {
+                    return _getTodosDue.call(this);
+                },
+                get overdue() {
+                    return _getOverdueTodos.call(this);
+                },
+                todos: project.todos
+            })
+        });
+        console.log(importArray);
+        projectArray = importArray;
+    }
+
+    function setAll(array) {
+        array.forEach((project, i) => {
+            const thisProj = projectArray[i];
+            thisProj.name = project.name;
+            thisProj.color = project.color;
+            thisProj.todos = project.todos;
+        });
     }
 
     function returnProjNames() {
@@ -230,8 +279,8 @@ const todo = (function() {
                 todos: []
             }
             projectArray.push(newProject);
+            return (projectArray.length - 1); // index of new project
         };
-        return projectArray;
     }
 
     function editItem(attr, value, projIndex, todoIndex = null) {
@@ -243,7 +292,6 @@ const todo = (function() {
             const thisProj = returnItem(projIndex);
             thisProj[attr] = value;
         }
-        return projectArray;
     }
     
     function moveItem(oldProjIndex, newProjIndex, oldTodoIndex = null) {
@@ -269,6 +317,8 @@ const todo = (function() {
     return {
         returnItem,
         returnAll,
+        exportAll,
+        importAll,
         returnProjNames,
         addItem,
         editItem,
