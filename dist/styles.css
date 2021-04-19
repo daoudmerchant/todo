@@ -2,6 +2,11 @@
 
 * {
     font-family: 'Raleway', sans-serif;
+    user-select: none;
+}
+
+html {
+    overflow-y: scroll;
 }
 
 body {
@@ -100,9 +105,10 @@ input[type="date"] {
 }
 
 textarea {
-    width: 95%;
+    user-select: all;
+    width: calc(100% - 75px);
     display: block;
-    margin: 0 auto 20px;
+    margin: 0 20px 20px;
     font-size: larger;
     padding: 1rem;
     border-radius: 8px;

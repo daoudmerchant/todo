@@ -1,129 +1,117 @@
 import todo from "./todo.js";
 import DOMtools from "./domtools.js";
 
-// work in console
 
-window.todo = todo;
-window.DOMtools = DOMtools;
+// RENDER MODULE
 
-const submit = function(element) {
-    const parent = element.parentElement;
-
-    const projIndex = (parent.dataset.projectindex === "null") ?
-        "null" : Number(parent.dataset.projectindex);
-    let todoIndex = undefined;
-    if (parent.hasAttribute("data-todoindex")) {
-        todoIndex = (parent.dataset.todoindex === "null") ?
-            "null" : Number(parent.dataset.todoindex);
-    }
-
-    if (element.getAttribute("type") === "color") { // color input
-        todo.editItem("color", element.value, projIndex + 1);
-    } else if (element.getAttribute("type") === "checkbox") { // checkbox
-        if (element.checked) {
-            todo.editItem("complete", true, projIndex, todoIndex);
-        } else {
-            todo.editItem("complete", false, projIndex, todoIndex);
-        }
-    } else if (element.getAttribute("type") === "text") { // text input
-        if (todoIndex === undefined) { // no todo index attribute, is a new box
-            if (projIndex === "null") { // no project index, is a new project
-                todo.addItem(element.value);
-            } else { // has numeric project index, is a new todo
-                todo.addItem(element.value, projIndex);
-            }
-        } else { // has own todo index attribute, is an edited box
-            if (todoIndex === "null") { // is an edited project
-                todo.editItem("name", element.value, (projIndex + 1));
-            } else { // has valid todo index, is an edited todo
-                todo.editItem("name", element.value, projIndex, todoIndex);
-            }
-        }
-    } else if (element.tagName === "SELECT") { // select box
-        todo.moveItem(projIndex, element.value, todoIndex);
-    } else if (element.textContent === "!") {
-        const newImportance = (element.dataset.importance !== "true");
-        todo.editItem("important", newImportance, projIndex, todoIndex);
-    } else if (element.getAttribute("type") === "date") { // date box
-        todo.editItem("dueDate", new Date(element.value), projIndex, todoIndex);
-    } else if (element.textContent === "✖") { // delete button
-        console.log(todoIndex);
-        console.log(projIndex);
-        if (todoIndex === "null") {
-            if (confirm("Delete todo list?")) {
-                todo.deleteItem(projIndex + 1);
-            }
-        } else {
-            if (confirm("Delete todo item?")) {
-                todo.deleteItem(projIndex, todoIndex);
-            }
-        }
-    }
-    else if (element.tagName === "TEXTAREA") { // notes
-        const notesText = (element.value) ? element.value : undefined;
-        todo.editItem("notes", notesText, projIndex, todoIndex);
-    }
+// - Defines view renders
+// - Attaches them to existing DOM elements
+// Requires both submit function AND todo module
 
 
+const render = (function() {
 
-    // new project container:
-    //  - project index: undefined
-    //  - no todo index
-    // new todo container:
-    //  - project index: always something, even 0
-    //  - no todo index
-    // edited project container:
-    //  - project-index: index of project - 1
-    //  - todo index of "null"
-    // edited todo container:
-    //  - project index: index
-    //  - todo index: index
-}
-
-// const render = (function() {
     // panel element queries
 
     const projectPanel = document.querySelector("#projectbar");
     const todoPanel = document.querySelector("#todoview");
 
-    // permanent project element queries
+    // permanent button element queries
 
     const defaultView = document.querySelector("#default");
     const importantView = document.querySelector("#important");
     const overdueView = document.querySelector("#overdue");
     const thisWeekView = document.querySelector("#duethisweek");
+    const allTodosView = document.querySelector("#viewall");
 
-    // attached event listeners
+    function _attachRenderEvent(...elements) {
+        elements.forEach(element => element.addEventListener("click", _renderView));
+    }
 
-    defaultView.addEventListener("click", renderView);
-    importantView.addEventListener("click", renderView);
-    overdueView.addEventListener("click", renderView);
-    thisWeekView.addEventListener("click", renderView);
+    _attachRenderEvent(
+        defaultView,
+        importantView,
+        overdueView,
+        thisWeekView,
+        allTodosView
+    );
 
-    // current render
-
+    // aggregate render functions
+    
+    function _renderAllLists(panel, array, attr) {
+        array.forEach((project, i) => {
+            renderList(panel, project[attr], project.color, i);
+        });
+    }
+    
+    function _renderView() {
+        _viewProjectList(); // always redraw project bar
+        if (this.hasAttribute("id")) { // not a project
+            switch (this.id) {
+                case "default" :
+                    _viewDefault();
+                    break;
+                case "important" :
+                    _viewImportant();
+                    break;
+                case "overdue" :
+                    _viewOverdue();
+                    break;
+                case "duethisweek" :
+                    _viewDueThisWeek();
+                    break;
+                case "viewall" :
+                    _viewAllTodos();
+                    break;
+            }
+        } else { // is project
+            _viewProject(Number(this.dataset.projectindex) + 1);
+        }
+    }
+    
+    // Render currently rendered todos
+    
     let _viewCurrent = _viewDefault;
+    
+    function renderCurrent() {
+        _viewProjectList();
+        _viewCurrent()
+    }
 
-    // view render functions
+    // Render other specific views:
+
+    // - project bar
+
+    function _viewProjectList() {
+        const userProjects = todo.returnAll().slice(1);
+        _renderPanel(projectPanel, renderList, userProjects);
+    }
+
+    // - todo views
 
     function _viewDefault() {
-        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "todos");
+        _renderPanel(todoPanel, _renderAllLists, todo.returnAll(), "outstanding");
         _viewCurrent = _viewDefault;
     }
 
     function _viewImportant() {
-        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "important");
+        _renderPanel(todoPanel, _renderAllLists, todo.returnAll(), "important");
         _viewCurrent = _viewImportant;
     }
 
     function _viewOverdue() {
-        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "overdue");
+        _renderPanel(todoPanel, _renderAllLists, todo.returnAll(), "overdue");
         _viewCurrent = _viewOverdue;
     }
 
     function _viewDueThisWeek() {
-        _renderPanel(todoPanel, renderAllLists, todo.returnAll(), "dueThisWeek")
+        _renderPanel(todoPanel, _renderAllLists, todo.returnAll(), "dueThisWeek")
         _viewCurrent = _viewDueThisWeek;
+    }
+
+    function _viewAllTodos() {
+        _renderPanel(todoPanel, _renderAllLists, todo.returnAll(), "todos");
+        _viewCurrent = _viewAllTodos;
     }
 
     function _viewProject(i) {
@@ -136,18 +124,26 @@ const submit = function(element) {
             // I have to account for readability when renderList() already has many
             // optional functions. This is an optional effect and can be easily
             // removed here
+        
         const thisProj = todo.returnItem(i);
         _renderPanel(todoPanel, renderList, thisProj.todos, thisProj.color, i)
         _selectProject(i);
         _viewCurrent = () => _viewProject(i);
     }
 
-    function _viewProjectList() {
-        const userProjects = todo.returnAll().slice(1);
-        console.log(typeof(userProjects));
-        _renderPanel(projectPanel, renderList, userProjects);
+
+    // SUBMIT AND RERENDER
+
+    // - Sends element information to submit function
+    // - rerenders page
+    // - required both when rendering a list AND when adding a new button
+     
+    function submitAndRerender() {
+        submit(this)
+        renderCurrent();
     }
 
+        
     // page rendering functions
 
     function _renderPanel(panel, callback, ...args) { // runs function and adds new box
@@ -185,338 +181,341 @@ const submit = function(element) {
         }
     }
 
-//     // projectPanel or to view specific project, e.g.
-//     //   _renderPanel(todoPanel, renderList, projectArray[1].todos, 1)
-//     //      - renders first user project
-//     //   _renderPanel(projectPanel, renderList, projectArray)
-//     //      - renders project panel
-
-    function renderAllLists(panel, array, attr) {
-        array.forEach((project, i) => {
-            renderList(panel, project[attr], project.color, i);
-        });
-    }
-
-    function submitAndRerender() {
-        submit(this)
-        renderCurrent();
-    }
-
-//     // To get default view:
     
-//     //     _renderPanel(todoPanel, renderAllLists, projectArray, todos)
+    // Render List:
 
-//     // runs:
+    // - Receives panel to be filled, array to be rendered and optional extra information for styling
+    // - Requires submit AND submitAndRerender
 
-//     //     DOMtools.rerender(todoPanel, renderAllLists, projectArray, todos)
+
+    function renderList(panel, array, color = null, projIndex = null) { // last two parameters optional
+
+        // element creation functions
         
-//     // which empties the todoPanel and then runs:
-
-//     //     renderAllLists(todoPanel, projectArray, todos)
-
-//     // which runs for each project of the projectArray:
-
-//     //     renderList(todoPanel, project[todos], i, project.color)
-
-//     // filling the todoPanel before adding a new button
-
-
-
-//     // To fill the project bar:
-
-//     //     _renderPanel(projectPanel, renderList, projectArray)
-
-//     // runs:
-
-//     //     DOMtools.rerender(projectPanel, renderList, projectArray)
-
-//     // which empties the projectPanel and then runs:
-
-//     //     renderList(projectPanel, projectArray)
-
-//     // filling the projectPanel before adding a new button
-
-//     // important: DOMtools.rerender(todoPanel, renderAllLists, projectArray, important)
-//     // overdue: DOMtools.rerender(todoPanel, renderAllLists, projectArray, overdue)
-//     // dueThisWeek: DOMtools.rerender(todoPanel, renderAllLists, projectArray, dueThisWeek)
-//     // specific project: _renderPanel(todoPanel, renderList, project.todos, projIndex, project.color)
-
-
-
-//     // public
-
-    function renderView() {
-        _viewProjectList(); // always redraw project bar
-        if (this.hasAttribute("id")) { // not a project
-            switch (this.id) {
-                case "default" :
-                    _viewDefault();
-                    break;
-                case "important" :
-                    _viewImportant();
-                    break;
-                case "overdue" :
-                    _viewOverdue();
-                    break;
-                case "duethisweek" :
-                    _viewDueThisWeek();
-                    break;
-            }
-        } else { // is project
-            _viewProject(Number(this.dataset.projectindex) + 1);
+        function createContainer(i) {
+            const container = DOMtools.returnElement({
+                type: "div",
+                class: "container",
+                attribute: {
+                    "data-projectindex": (projIndex !== null) ? projIndex : i,
+                    "data-todoindex": (projIndex !== null) ? i : "null"
+                }
+            });
+            // container.addEventListener("click", _renderView); // if click event better 
+            return container;
         }
-    }
-
-    function renderCurrent() {
-        _viewProjectList();
-        _viewCurrent()
-    }
-
-//     return {
-//         renderView,
-//         renderCurrent
-//     }
-// })();
-
-function renderList(panel, array, color = null, projIndex = null) { // last two parameters optional
-
-    // element creation functions
-
-    function createContainer(i) {
-        const container = DOMtools.returnElement({
-            type: "div",
-            class: "container",
-            attribute: {
-                "data-projectindex": (projIndex !== null) ? projIndex : i,
-                "data-todoindex": (projIndex !== null) ? i : "null"
-            }
-        });
-        // container.addEventListener("click", renderView);
-        return container;
-    }
-
-    function createColorPicker(color) { // send obj.color
-        const colorPicker = DOMtools.returnElement({
-            type: "input",
-            attribute: {
-                type: "color",
-                value: color
-            }
-        });
-        colorPicker.addEventListener("change", submitAndRerender)
-        return colorPicker;
-    }
-
-    function createCheckbox(complete) { // requires id and name to submit correctly?
-        const checkbox = DOMtools.returnElement({
-            type: "input",
-            attribute: {
-                type: "checkbox"
-            }
-        });
-        if (complete) {
-            checkbox.checked = "true"
+        
+        function createColorPicker(color) { // send obj.color
+            const colorPicker = DOMtools.returnElement({
+                type: "input",
+                attribute: {
+                    type: "color",
+                    value: color
+                }
+            });
+            colorPicker.addEventListener("change", submitAndRerender)
+            return colorPicker;
         }
-        checkbox.addEventListener("change", submitAndRerender);
-        return checkbox;
-    }
-
-    function createName(obj) {
-        const nameText = DOMtools.returnElement({
-            type: "p",
-            class: "text name",
-            text: obj.name,
-        })
-        if (obj.complete) {
-            nameText.classList.add("complete")
-        } else {
-            nameText.setAttribute(
-                "style",
-                (color) ? `color:${color}` : `color:${obj.color}`
-            )
+        
+        function createCheckbox(complete) { // requires id and name for accessibility?
+            const checkbox = DOMtools.returnElement({
+                type: "input",
+                attribute: {
+                    type: "checkbox"
+                }
+            });
+            if (complete) {
+                checkbox.checked = "true"
+            }
+            checkbox.addEventListener("change", submitAndRerender);
+            return checkbox;
         }
-        if (projIndex === null) { // project view
-            let timer = 0;
-            let prevent = false;
-            nameText.addEventListener("click", e => {
-                timer = setTimeout(function() {
-                    if (!prevent) {
-                        renderView.call(e.target.parentElement);
+        
+        function createName(obj) {
+            const nameText = DOMtools.returnElement({
+                type: "p",
+                class: "text name",
+                text: obj.name,
+            })
+            if (obj.complete) {
+                nameText.classList.add("complete")
+            } else {
+                nameText.setAttribute(
+                    "style",
+                    (color) ? `color:${color}` : `color:${obj.color}`
+                    )
+                }
+                let timer = 0;
+                let prevent = false;
+                nameText.addEventListener("click", e => {
+                    timer = setTimeout(function() {
+                        if (!prevent) {
+                            if (projIndex === null) { // project view
+                                _renderView.call(e.target.parentElement);
+                            } else {
+                                _toggleNotesAndSubmit(e.target);
+                        }
                     }
                 }, 200);
             });
             nameText.addEventListener("dblclick", e => {
                 clearTimeout(timer);
                 prevent = true;
-                toggleInput(e.target);
+                _toggleInput(e.target);
             });
-        } else {
-            nameText.addEventListener("click", toggleNotesAndSubmit)
+            return nameText;
         }
-        return nameText;
-    }
-
-    function createNameInput(name) { // send obj.name
-        const nameInput = DOMtools.returnElement({
-            type: "input",
-            class: "text textinput hidden",
-            attribute: {
-                type: "text",
-                spellcheck: "false",
-                value: name
-            }
-        });
-        nameInput.addEventListener("focusout", submitAndRerender);
-        return nameInput;
-    }
-
-    function createSelectBox() {
-        const selectContainer = DOMtools.returnElement({
-            type: "select",
-            class: "text select"
-        });
-        todo.returnProjNames().forEach((project, i) => {
-            const option = DOMtools.returnElement({
-                type: "option",
-                text: project,
+        
+        function createNameInput(name) { // send obj.name
+            const nameInput = DOMtools.returnElement({
+                type: "input",
+                class: "text textinput hidden",
                 attribute: {
-                    value: i
+                    type: "text",
+                    spellcheck: "false",
+                    value: name
+                }
+            });
+            nameInput.addEventListener("focusout", submitAndRerender);
+            return nameInput;
+        }
+        
+        function createSelectBox() {
+            const selectContainer = DOMtools.returnElement({
+                type: "select",
+                class: "text select"
+            });
+            todo.returnProjNames().forEach((project, i) => {
+                const option = DOMtools.returnElement({
+                    type: "option",
+                    text: project,
+                    attribute: {
+                        value: i
+                    }
+                })
+                if (i == projIndex) {
+                    option.selected = "selected";
+                }
+                selectContainer.appendChild(option);
+            })
+            selectContainer.addEventListener("change", submitAndRerender);
+            return selectContainer;
+        }
+        
+        function createImportantIcon(importance) { // send obj.important
+            const importantIcon = DOMtools.returnElement({
+                type: "p",
+                class: (importance) ? "importance urgent" : "importance",
+                text: "!",
+                
+            });
+            if (importance) {
+                importantIcon.setAttribute("data-importance", "true");
+            }
+            importantIcon.addEventListener("click", submitAndRerender);
+            return importantIcon;
+        }
+        
+        function createDateInput(date = null) {
+            function make2Decimals(num) {
+                return num.toString().padStart(2, "0");
+            };
+            const dateInput = DOMtools.returnElement({
+                type: "input",
+                class: "textinput",
+                attribute: {
+                    type: "date"
+                }
+            });
+            if (date) {
+                dateInput.setAttribute(
+                    "value",
+                    (date.getFullYear() + "-" +
+                    make2Decimals(date.getMonth()) + "-" +
+                    make2Decimals(date.getDate()))
+                    );
+                }
+                dateInput.addEventListener("input", submitAndRerender);
+                return dateInput
+            }
+            
+        function createDeleteKey() {
+            const deleteKey = DOMtools.returnElement({
+                type: "div",
+                class: "delete",
+                text: "✖"
+            });
+            deleteKey.addEventListener("click", submitAndRerender);
+            return deleteKey;
+        };
+        
+        function createNotesBox(notes) { // send obj.notes
+            const notesBox = DOMtools.returnElement({
+                type: "textarea",
+                class: "textarea hidden",
+                attribute: {
+                    rows: "6",
+                    spellcheck: "false"
                 }
             })
-            if (i == projIndex) {
-                option.selected = "selected";
+            if (notes) {
+                notesBox.textContent = notes;
             }
-            selectContainer.appendChild(option);
-        })
-        selectContainer.addEventListener("change", submitAndRerender);
-        return selectContainer;
-    }
-
-    function createImportantIcon(importance) { // send obj.important
-        const importantIcon = DOMtools.returnElement({
-            type: "p",
-            class: (importance) ? "importance urgent" : "importance",
-            text: "!",
-
-        });
-        if (importance) {
-            importantIcon.setAttribute("data-importance", "true");
+            notesBox.addEventListener("focusout", e => submit(e.target));
+            // or modify submit function to check if event or element
+            return notesBox;
         }
-        importantIcon.addEventListener("click", submitAndRerender);
-        return importantIcon;
-    }
-
-    function createDateInput(date = null) {
-        function make2Decimals(num) {
-            return num.toString().padStart(2, "0");
-        };
-        const dateInput = DOMtools.returnElement({
-            type: "input",
-            class: "textinput",
-            attribute: {
-                type: "date"
+        
+        // event listener functions
+        
+        function _toggleNotesAndSubmit(element) {
+            const notes = element.parentElement.parentElement.lastChild;
+    
+            if (notes.classList.contains("hidden")) { // click to reveal
+                notes.classList.remove("hidden");
+            } else { // click to hide and (submit contents)
+                submit(notes);
+                notes.classList.add("hidden")
             }
-        });
-        if (date) {
-            dateInput.setAttribute(
-                "value",
-                (date.getFullYear() + "-" +
-                make2Decimals(date.getMonth()) + "-" +
-                make2Decimals(date.getDate()))
-            );
         }
-        dateInput.addEventListener("input", submitAndRerender);
-        return dateInput
+        
+        function _toggleInput(element) {
+            element.classList.add("hidden");
+            const input = element.nextElementSibling;
+            input.classList.remove("hidden");
+            input.focus();
+            input.select();
+        }
+    
+        // draw list
+    
+        if (projIndex !== null) { // list of todos
+            array.forEach((obj, i) => {
+                const outerContainer = createContainer(i)
+                outerContainer.className = "box"; // overwrite class
+                const innerContainer = createContainer(i); // flex container
+                DOMtools.appendChildren(
+                    innerContainer,
+                    createCheckbox(obj.complete),
+                    createName(obj),
+                    createNameInput(obj.name),
+                    createSelectBox(),
+                    createImportantIcon(obj.important),
+                    createDateInput(obj.dueDate),
+                    createDeleteKey(),
+                );
+                DOMtools.appendChildren(
+                    outerContainer,
+                    innerContainer,
+                    createNotesBox(obj.notes)
+                )
+                panel.appendChild(outerContainer);
+            });
+        } else { // list of projects
+            array.forEach((obj, i) => {
+                const container = createContainer(i);
+                container.classList.add("box", "project");
+                DOMtools.appendChildren(
+                    container,
+                    createColorPicker(obj.color),
+                    createName(obj),
+                    createNameInput(obj.name),
+                    createDeleteKey()
+                )
+                panel.appendChild(container);
+            });
+        }
     }
 
-    function createDeleteKey() {
-        const deleteKey = DOMtools.returnElement({
-            type: "div",
-            class: "delete",
-            text: "✖"
-        });
-        deleteKey.addEventListener("click", submitAndRerender);
-        return deleteKey;
-    };
+    // returned publicly to allow render on page load
+    
+    return {
+        renderCurrent,
+    }
 
-    function createNotesBox(notes) { // send obj.notes
-        const notesBox = DOMtools.returnElement({
-            type: "textarea",
-            class: "textarea hidden",
-            attribute: {
-                rows: "6",
-                spellcheck: "false"
+})();
+
+
+// SUBMIT FUNCTION
+
+// - queries attached element
+// - submits relevant information to relevant todo module function
+// requires todo module
+
+
+function submit(element) {
+    const parent = element.parentElement;
+
+    const projIndex = (parent.dataset.projectindex === "null") ?
+        "null" : Number(parent.dataset.projectindex);
+    let todoIndex = undefined;
+    if (parent.hasAttribute("data-todoindex")) {
+        todoIndex = (parent.dataset.todoindex === "null") ?
+            "null" : Number(parent.dataset.todoindex);
+    }
+
+    if (element.getAttribute("type") === "color") { // color input
+        todo.editItem("color", element.value, projIndex + 1);
+    } else if (element.getAttribute("type") === "checkbox") { // checkbox
+        if (element.checked) {
+            todo.editItem("complete", true, projIndex, todoIndex);
+        } else {
+            todo.editItem("complete", false, projIndex, todoIndex);
+        }
+    } else if (element.getAttribute("type") === "text") { // text input
+
+            // new project container:
+            //  - project index: undefined
+            //  - no todo index
+            // new todo container:
+            //  - project index: always something, even 0
+            //  - no todo index
+            // edited project container:
+            //  - project-index: index of project - 1
+            //  - todo index of "null"
+            // edited todo container:
+            //  - project index: index
+            //  - todo index: index
+
+        if (todoIndex === undefined) { // no todo index attribute, is a new box
+            if (projIndex === "null") { // no project index, is a new project
+                todo.addItem(element.value);
+            } else { // has numeric project index, is a new todo
+                todo.addItem(element.value, projIndex);
             }
-        })
-        if (notes) {
-            notesBox.textContent = notes;
+        } else { // has own todo index attribute, is an edited box
+            if (todoIndex === "null") { // is an edited project
+                todo.editItem("name", element.value, (projIndex + 1));
+            } else { // has valid todo index, is an edited todo
+                todo.editItem("name", element.value, projIndex, todoIndex);
+            }
         }
-        notesBox.addEventListener("focusout", e => submit(e.target));
-            // or get submit function to check if event or element
-        return notesBox;
-    }
-
-    // event listener functions
-
-
-
-    function toggleNotesAndSubmit() {
-        const notes = this.parentElement.parentElement.lastChild;
-
-        if (notes.classList.contains("hidden")) { // click to reveal
-            notes.classList.remove("hidden");
-        } else { // click to hide and (submit contents)
-            submit(notes);
-            notes.classList.add("hidden")
+    } else if (element.tagName === "SELECT") { // select box
+        todo.moveItem(projIndex, element.value, todoIndex);
+    } else if (element.textContent === "!") {
+        const newImportance = (element.dataset.importance !== "true");
+        todo.editItem("important", newImportance, projIndex, todoIndex);
+    } else if (element.getAttribute("type") === "date") { // date box
+        todo.editItem("dueDate", new Date(element.value), projIndex, todoIndex);
+    } else if (element.textContent === "✖") { // delete button
+        console.log(todoIndex);
+        console.log(projIndex);
+        if (todoIndex === "null") {
+            if (confirm("Delete todo list?")) {
+                todo.deleteItem(projIndex + 1);
+            }
+        } else {
+            if (confirm("Delete todo item?")) {
+                todo.deleteItem(projIndex, todoIndex);
+            }
         }
     }
-
-    function toggleInput(element) {
-        element.classList.add("hidden");
-        const input = element.nextElementSibling;
-        input.classList.remove("hidden");
-        input.focus();
-        input.select();
-    }
-
-    // draw list
-
-    if (projIndex !== null) { // list of todos
-        array.forEach((obj, i) => {
-            const outerContainer = createContainer(i)
-            outerContainer.className = "box"; // overwrite class
-            const innerContainer = createContainer(i);
-            DOMtools.appendChildren(
-                innerContainer,
-                createCheckbox(obj.complete),
-                createName(obj),
-                createNameInput(obj.name),
-                createSelectBox(),
-                createImportantIcon(obj.important),
-                createDateInput(obj.dueDate),
-                createDeleteKey(),
-            );
-            DOMtools.appendChildren(
-                outerContainer,
-                innerContainer,
-                createNotesBox(obj.notes)
-            )
-            panel.appendChild(outerContainer);
-        });
-    } else { // list of projects
-        array.forEach((obj, i) => {
-            const container = createContainer(i);
-            container.classList.add("box", "project");
-            DOMtools.appendChildren(
-                container,
-                createColorPicker(obj.color),
-                createName(obj),
-                createNameInput(obj.name),
-                createDeleteKey()
-            )
-            panel.appendChild(container);
-        });
+    else if (element.tagName === "TEXTAREA") { // notes
+        const notesText = (element.value) ? element.value : undefined;
+        todo.editItem("notes", notesText, projIndex, todoIndex);
     }
 }
 
-renderCurrent();
+// on page load
+
+render.renderCurrent();

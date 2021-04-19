@@ -3,6 +3,9 @@ const todo = (function() {
         {
             name: "-- default --",
             color: "#000000",
+            get outstanding() {
+                return _getOutstandingTodos.call(this);
+            },
             get complete() {
                 return _getCompleteStatus.call(this);
             },
@@ -36,6 +39,9 @@ const todo = (function() {
 
             name: "Do the cleaning",
             color: "#4245f5",
+            get outstanding() {
+                return _getOutstandingTodos.call(this);
+            },
             get complete() {
                 return _getCompleteStatus.call(this);
             },
@@ -51,7 +57,7 @@ const todo = (function() {
             todos: [
                 {
                     name: "Tidy up my room",
-                    dueDate: new Date(2021, 7, 5),
+                    dueDate: new Date(2021, 3, 21),
                     important: true,
                     notes: "Put the socks in the drawers, generally sort it out",
                     complete: false
@@ -83,6 +89,9 @@ const todo = (function() {
 
             name: "Learn French",
             color: "#f57e42",
+            get outstanding() {
+                return _getOutstandingTodos.call(this);
+            },
             get complete() {
                 return _getCompleteStatus.call(this);
             },
@@ -129,6 +138,10 @@ const todo = (function() {
     ];
 
     // methods
+
+    function _getOutstandingTodos() {
+        return this.todos.filter(todo => todo.complete === false);
+    }
 
     function _getCompleteStatus() {
         let complete;
@@ -199,6 +212,9 @@ const todo = (function() {
             const newProject = {
                 name,
                 color: "#000000",
+                get outstanding() {
+                    return _getOutstandingTodos.call(this);
+                },
                 get complete() {
                     return _getCompleteStatus.call(this);
                 },
