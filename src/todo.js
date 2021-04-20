@@ -202,12 +202,10 @@ const todo = (function() {
                 todos: project.todos
             })
         })
-        console.log(exportArray);
         return exportArray;
     }
 
     function importAll(userArray) {
-        console.log(userArray);
         const importArray = userArray.map(project => {
             return ({
                 name: project.name,
@@ -230,7 +228,6 @@ const todo = (function() {
                 todos: project.todos
             })
         });
-        console.log(importArray);
         projectArray = importArray;
     }
 

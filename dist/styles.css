@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap');
 
+/* global styles */
+
 * {
     font-family: 'Raleway', sans-serif;
     user-select: none;
@@ -16,6 +18,12 @@ body {
     grid-template-columns: 500px 1fr;
 }
 
+.viewbutton, .projectContainer, .delete, .notes, .importance, input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* permanent element styles */
+
 #sidebar {
     background-color:lavender;
 }
@@ -23,6 +31,17 @@ body {
 #todoview {
     background-color: lavenderblush;
 }
+
+#projecthead {
+    cursor: auto;
+    border-top: 1px solid black;
+    padding-top: 2rem;
+    margin: 0 2rem;
+    font-size: 1.6rem;
+    font-weight: 400;
+}
+
+/* shared project and todo styles */
 
 .box {
     border: 1px solid darkgrey;
@@ -35,35 +54,8 @@ body {
     align-items: center;
 }
 
-.viewbutton {
-    font-size: 2rem;
-    font-weight: 600;
-}
-
-.viewbutton, .projectContainer, .delete, .notes, .importance, input[type="checkbox"] {
-    cursor: pointer;
-}
-
-.viewbutton, .box {
-    margin: 2rem;
-}
-
-#projecthead {
-    cursor: auto;
-    border-top: 1px solid black;
-    padding-top: 2rem;
-    margin: 0 2rem;
-    font-size: 1.6rem;
-    font-weight: 400;
-}
-
 .container > * {
     margin: 10px;
-}
-
-input[type="color"], input[type="checkbox"] {
-    width: 30px;
-    height: 25px;
 }
 
 .text {
@@ -71,12 +63,9 @@ input[type="color"], input[type="checkbox"] {
     padding: 0;
 }
 
-.select {
-    width: 50%
-}
-
-.name, .importance, .delete {
-    user-select: none;
+.viewbutton {
+    font-size: 2rem;
+    font-weight: 600;
 }
 
 .textinput {
@@ -91,6 +80,53 @@ input[type="color"], input[type="checkbox"] {
 .textinput:focus{
     outline: none;
     background-color: rgba(0, 0, 0, 0.05);
+}
+
+.complete {
+    color: rgba(0, 0, 0, 0.2);
+    text-decoration: line-through;
+}
+
+.hidden {
+    display: none;
+}
+
+input[type="color"], input[type="checkbox"] {
+    width: 30px;
+    height: 25px;
+}
+
+/* project styles */
+
+.selected {
+    background-color: white;
+}
+
+/* todo styles */
+
+.select {
+    width: 50%
+}
+
+.viewbutton, .box {
+    margin: 2rem;
+}
+
+.name, .importance, .delete {
+    user-select: none;
+}
+
+.importance {
+    color: rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    font-size: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0 10px;
+    border-radius: 8px;
+}
+
+.urgent {
+    color: red;
 }
 
 input[type="date"] {
@@ -118,30 +154,4 @@ textarea {
 
 textarea:focus {
     outline: none;
-}
-
-.importance {
-    color: rgba(0, 0, 0, 0.1);
-    font-weight: bold;
-    font-size: 1.5rem;
-    background-color: rgba(0, 0, 0, 0.05);
-    padding: 0 10px;
-    border-radius: 8px;
-}
-
-.urgent {
-    color: red;
-}
-
-.complete {
-    color: rgba(0, 0, 0, 0.2);
-    text-decoration: line-through;
-}
-
-.hidden {
-    display: none;
-}
-
-.selected {
-    background-color: white;
 }
